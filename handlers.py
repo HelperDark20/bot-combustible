@@ -1,113 +1,69 @@
-# ==========================================
-# IMPORTS
-# ==========================================
-from telegram import Update
-
-from telegram.ext import ContextTypes
-
-from ocr import analizar_imagen_gpt
-
-from score import construir_respuesta
-
-from database import (
-
-    guardar_viaje,
-    cursor,
-    conn
-)
-
-from stats import obtener_stats
-
-from telegram_ui import (
-
-    menu_principal,
-    botones_viaje,
-    boton_cancelar
-)
+# =========================================
+# HANDLERS.PY
+# =========================================
 
 import json
 
-# ==========================================
-# VARIABLES
-# ==========================================
-from state import usuarios_esperando_foto
+from telegram import (
+    Update,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton
+)
 
-# ==========================================
+from telegram.ext import (
+    ContextTypes
+)
+
+from telegram_ui import (
+    menu_principal
+)
+
+from state import (
+    usuarios_esperando_foto
+)
+
+from database import (
+    guardar_viaje,
+    obtener_viajes,
+    reiniciar_dia
+)
+
+from ocr import (
+    analizar_imagen_openai
+)
+
+from score import (
+    calcular_score
+)
+
+from stats import (
+    obtener_estadisticas
+)
+
+from fuel import (
+    obtener_resumen_combustible
+)
+
+# =========================================
 # START
-# ==========================================
+# =========================================
+
 async def start(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
 
     await update.message.reply_text(
-
         "🚖 BOT IA VIAJES\n\n"
         "Selecciona una opción:",
-
         reply_markup=menu_principal()
     )
 
-# ==========================================
-# VER VIAJES
-# ==========================================
-async def mostrar_viajes(query):
+# =========================================
+# CALLBACK BOTONES
+# =========================================
 
-    cursor.execute("""
-
-    SELECT
-    id,
-    tipo_viaje,
-    dinero,
-    score_visual,
-    estado
-
-    FROM viajes
-
-    ORDER BY id DESC
-
-    LIMIT 15
-
-    """)
-
-    viajes = cursor.fetchall()
-
-    if not viajes:
-
-        await query.message.reply_text(
-            "❌ No hay viajes."
-        )
-
-        return
-
-    for viaje in viajes:
-
-        viaje_id = viaje[0]
-
-        texto = (
-
-            f"🚘 {viaje[1]}\n\n"
-
-            f"💰 {viaje[2]:,} COP\n"
-
-            f"⭐ {viaje[3]}/10\n"
-
-            f"📌 Estado: {viaje[4]}"
-        )
-
-        await query.message.reply_text(
-
-            texto,
-
-            reply_markup=boton_cancelar(
-                viaje_id
-            )
-        )
-
-# ==========================================
-# BOTONES
-# ==========================================
-async def botones(
+async def botones_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
@@ -116,201 +72,229 @@ async def botones(
 
     await query.answer()
 
-    user_id = query.from_user.id
-
-    data = query.data
-
-    # ======================================
+    # =====================================
     # ANALIZAR
-    # ======================================
+    # =====================================
 
-    if data == "analizar":
+    if query.data == "analizar":
 
         usuarios_esperando_foto.add(
-            user_id
+            query.from_user.id
         )
 
         await query.message.reply_text(
             "📸 Envíame la captura."
         )
 
-    # ======================================
+    # =====================================
     # VER VIAJES
-    # ======================================
+    # =====================================
 
-    elif data == "ver_viajes":
+    elif query.data == "ver_viajes":
 
-        await mostrar_viajes(query)
+        viajes = obtener_viajes()
 
-    # ======================================
-    # STATS
-    # ======================================
+        if not viajes:
 
-    elif data == "stats":
+            await query.message.reply_text(
+                "❌ No hay viajes guardados."
+            )
+
+            return
+
+        texto = "🚗 VIAJES DEL DÍA\n\n"
+
+        for viaje in viajes:
+
+            texto += (
+                f"💰 {viaje['ganancia']:,.0f} COP\n"
+                f"📍 {viaje['distancia']} km\n"
+                f"⭐ {viaje['score']}/10\n\n"
+            )
 
         await query.message.reply_text(
-            obtener_stats()
+            texto
         )
 
-    # ======================================
+    # =====================================
+    # ESTADÍSTICAS
+    # =====================================
+
+    elif query.data == "stats":
+
+        texto = obtener_estadisticas()
+
+        await query.message.reply_text(
+            texto
+        )
+
+    # =====================================
+    # CONFIGURACIÓN
+    # =====================================
+
+    elif query.data == "config":
+
+        texto = obtener_resumen_combustible()
+
+        await query.message.reply_text(
+            texto
+        )
+
+    # =====================================
     # REINICIAR
-    # ======================================
+    # =====================================
 
-    elif data == "reiniciar":
+    elif query.data == "reiniciar":
 
-        cursor.execute("""
-        DELETE FROM viajes
-        """)
-
-        conn.commit()
+        reiniciar_dia()
 
         await query.message.reply_text(
             "🗑 Día reiniciado."
         )
 
-    # ======================================
+    # =====================================
     # ACEPTADO
-    # ======================================
+    # =====================================
 
-    elif data.startswith("aceptado_"):
-
-        viaje_id = data.split("_")[1]
-
-        cursor.execute("""
-
-        UPDATE viajes
-
-        SET estado='aceptado'
-
-        WHERE id=?
-
-        """, (viaje_id,))
-
-        conn.commit()
+    elif query.data.startswith("aceptado_"):
 
         await query.message.reply_text(
             "✅ Viaje aceptado."
         )
 
-    # ======================================
+    # =====================================
     # RECHAZADO
-    # ======================================
+    # =====================================
 
-    elif data.startswith("rechazado_"):
-
-        viaje_id = data.split("_")[1]
-
-        cursor.execute("""
-
-        UPDATE viajes
-
-        SET estado='rechazado'
-
-        WHERE id=?
-
-        """, (viaje_id,))
-
-        conn.commit()
+    elif query.data.startswith("rechazado_"):
 
         await query.message.reply_text(
             "❌ Viaje rechazado."
         )
 
-    # ======================================
-    # CANCELADO
-    # ======================================
-
-    elif data.startswith("cancelar_"):
-
-        viaje_id = data.split("_")[1]
-
-        cursor.execute("""
-
-        UPDATE viajes
-
-        SET estado='cancelado'
-
-        WHERE id=?
-
-        """, (viaje_id,))
-
-        conn.commit()
-
-        await query.message.reply_text(
-            "🚫 Viaje cancelado."
-        )
-
-# ==========================================
+# =========================================
 # RECIBIR IMAGEN
-# ==========================================
+# =========================================
+
 async def recibir_imagen(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
 
-    user_id = update.effective_user.id
+    user_id = update.message.from_user.id
 
     if user_id not in usuarios_esperando_foto:
         return
 
+    usuarios_esperando_foto.remove(user_id)
+
+    foto = update.message.photo[-1]
+
+    archivo = await foto.get_file()
+
+    ruta = "temp.jpg"
+
+    await archivo.download_to_drive(ruta)
+
+    resultado = analizar_imagen_openai(
+        ruta
+    )
+
+    if not resultado:
+
+        await update.message.reply_text(
+            "❌ No pude analizar la imagen."
+        )
+
+        return
+
     try:
 
-        foto = update.message.photo[-1]
+        datos = json.loads(resultado)
 
-        archivo = await foto.get_file()
-
-        ruta = f"captura_{user_id}.jpg"
-
-        await archivo.download_to_drive(
-            ruta
-        )
+    except:
 
         await update.message.reply_text(
-            "🧠 Analizando..."
+            "❌ Error leyendo datos IA."
         )
 
-        respuesta_gpt = analizar_imagen_gpt(
-            ruta
-        )
+        return
 
-        respuesta_gpt = (
+    tipo = datos.get("tipo", "Desconocido")
 
-            respuesta_gpt
+    ganancia = float(
+        datos.get("ganancia", 0)
+    )
 
-            .replace("```json", "")
+    distancia = float(
+        datos.get("distancia", 0)
+    )
 
-            .replace("```", "")
+    tiempo = int(
+        datos.get("tiempo", 0)
+    )
 
-            .strip()
-        )
+    score, mensaje = calcular_score(
+        ganancia,
+        distancia
+    )
 
-        data = json.loads(
-            respuesta_gpt
-        )
+    cop_km = (
+        ganancia / distancia
+        if distancia > 0 else 0
+    )
 
-        viaje_id = guardar_viaje(data)
+    cop_min = (
+        ganancia / tiempo
+        if tiempo > 0 else 0
+    )
 
-        respuesta = construir_respuesta(
-            data
-        )
+    viaje_id = guardar_viaje(
 
-        await update.message.reply_text(
+        tipo=tipo,
+        ganancia=ganancia,
+        distancia=distancia,
+        tiempo=tiempo,
+        score=score
 
-            respuesta,
+    )
 
-            reply_markup=botones_viaje(
-                viaje_id
+    keyboard = InlineKeyboardMarkup([
+
+        [
+
+            InlineKeyboardButton(
+                "✅ Aceptado",
+                callback_data=f"aceptado_{viaje_id}"
+            ),
+
+            InlineKeyboardButton(
+                "❌ Rechazado",
+                callback_data=f"rechazado_{viaje_id}"
             )
-        )
 
-        usuarios_esperando_foto.remove(
-            user_id
-        )
+        ]
 
-    except Exception as e:
+    ])
 
-        print(e)
+    texto = f"""
+📲 VIA SHORTCUTS
 
-        await update.message.reply_text(
-            f"❌ Error:\n{e}"
-        )
+🚘 {tipo}
+
+💰 {ganancia:,.0f} COP
+📍 {distancia} km
+⏱ {tiempo} min
+
+💸 {cop_km:,.0f} COP/km
+⌛ {cop_min:,.0f} COP/min
+
+⭐ Score: {score}/10
+
+🔥 {mensaje}
+"""
+
+    await update.message.reply_text(
+        texto,
+        reply_markup=keyboard
+    )

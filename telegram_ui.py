@@ -38,6 +38,13 @@ def menu_principal():
 
         [
             InlineKeyboardButton(
+                "⛽ Configuración",
+                callback_data="config"
+            )
+        ],
+        
+        [
+            InlineKeyboardButton(
                 "🗑 Reiniciar día",
                 callback_data="reiniciar"
             )
