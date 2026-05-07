@@ -22,10 +22,20 @@ from handlers import (
 
     start,
     botones_callback,
-    recibir_imagen
+    recibir_imagen,
+    recibir_texto
 )
 
 from shortcuts import flask_app
+
+from fuel import (
+    crear_tabla_config
+)
+
+# ==========================================
+# CREAR TABLA CONFIG
+# ==========================================
+crear_tabla_config()
 
 # ==========================================
 # TELEGRAM
@@ -46,8 +56,9 @@ telegram_app.add_handler(
 )
 
 telegram_app.add_handler(
+
     CallbackQueryHandler(
-    botones_callback
+        botones_callback
     )
 )
 
@@ -56,6 +67,18 @@ telegram_app.add_handler(
     MessageHandler(
         filters.PHOTO,
         recibir_imagen
+    )
+)
+
+telegram_app.add_handler(
+
+    MessageHandler(
+
+        filters.TEXT
+        & ~filters.COMMAND,
+
+        recibir_texto
+
     )
 )
 
