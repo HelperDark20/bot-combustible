@@ -6,7 +6,7 @@ from database import cursor
 # ==========================================
 # OBTENER STATS
 # ==========================================
-def obtener_stats():
+def obtener_estadisticas():
 
     # ======================================
     # TOTAL VIAJES
