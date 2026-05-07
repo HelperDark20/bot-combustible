@@ -1,0 +1,1 @@
+usuarios_esperando_foto = set()

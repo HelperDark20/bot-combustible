@@ -1,0 +1,87 @@
+# ==========================================
+# IMPORTS
+# ==========================================
+import threading
+
+from telegram.ext import (
+
+    Application,
+    CommandHandler,
+    MessageHandler,
+    CallbackQueryHandler,
+    filters
+)
+
+from config import (
+
+    TOKEN,
+    PORT
+)
+
+from handlers import (
+
+    start,
+    botones,
+    recibir_imagen
+)
+
+from shortcuts import flask_app
+
+# ==========================================
+# TELEGRAM
+# ==========================================
+telegram_app = (
+
+    Application
+    .builder()
+    .token(TOKEN)
+    .build()
+)
+
+# ==========================================
+# HANDLERS
+# ==========================================
+telegram_app.add_handler(
+    CommandHandler("start", start)
+)
+
+telegram_app.add_handler(
+    CallbackQueryHandler(botones)
+)
+
+telegram_app.add_handler(
+
+    MessageHandler(
+        filters.PHOTO,
+        recibir_imagen
+    )
+)
+
+# ==========================================
+# FLASK THREAD
+# ==========================================
+def run_flask():
+
+    print("🔥 FLASK ACTIVO")
+
+    flask_app.run(
+
+        host="0.0.0.0",
+
+        port=PORT
+    )
+
+# ==========================================
+# MAIN
+# ==========================================
+if __name__ == "__main__":
+
+    flask_thread = threading.Thread(
+        target=run_flask
+    )
+
+    flask_thread.start()
+
+    print("🔥 TELEGRAM ACTIVO")
+
+    telegram_app.run_polling()
