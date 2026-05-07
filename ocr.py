@@ -54,7 +54,7 @@ def optimizar_imagen(ruta_original):
 # ==========================================
 # GPT VISION
 # ==========================================
-def analizar_imagen_gpt(ruta_imagen):
+def analizar_imagen_openai(ruta_imagen):
 
     ruta_imagen = optimizar_imagen(
         ruta_imagen
