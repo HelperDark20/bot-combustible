@@ -21,7 +21,7 @@ from config import (
 from handlers import (
 
     start,
-    botones,
+    botones_callback,
     recibir_imagen
 )
 
@@ -46,7 +46,9 @@ telegram_app.add_handler(
 )
 
 telegram_app.add_handler(
-    CallbackQueryHandler(botones)
+    CallbackQueryHandler(
+    botones_callback
+    )
 )
 
 telegram_app.add_handler(
