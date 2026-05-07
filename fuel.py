@@ -11,6 +11,10 @@ from config import (
     DEFAULT_TANQUE
 )
 
+from database import (
+    obtener_viajes
+)
+
 # =========================================
 # CREAR TABLA CONFIG
 # =========================================
@@ -135,6 +139,51 @@ def calcular_ganancia_neta(
     return round(neta, 2)
 
 # =========================================
+# GASTO COMBUSTIBLE TOTAL
+# =========================================
+
+def calcular_gasto_combustible_total():
+
+    viajes = obtener_viajes()
+
+    costo_km = calcular_costo_km()
+
+    gasto_total = 0
+
+    for viaje in viajes:
+
+        distancia = viaje[
+            "distancia_total"
+        ]
+
+        gasto_total += (
+            distancia * costo_km
+        )
+
+    return round(gasto_total, 2)
+
+# =========================================
+# COMBUSTIBLE RESTANTE
+# =========================================
+
+def calcular_combustible_restante():
+
+    tanque = obtener_config(
+        "tanque"
+    )
+
+    gasto = (
+        calcular_gasto_combustible_total()
+    )
+
+    restante = tanque - gasto
+
+    if restante < 0:
+        restante = 0
+
+    return round(restante, 2)
+
+# =========================================
 # RESUMEN CONFIG
 # =========================================
 
@@ -149,6 +198,14 @@ def obtener_resumen_combustible():
     tanque = obtener_config("tanque")
 
     costo_km = calcular_costo_km()
+
+    gasto_total = (
+        calcular_gasto_combustible_total()
+    )
+
+    restante = (
+        calcular_combustible_restante()
+    )
 
     return f"""
 
@@ -165,5 +222,11 @@ def obtener_resumen_combustible():
 
 📉 Costo por KM:
 {costo_km:,.0f} COP/km
+
+⛽ Gasto combustible:
+{gasto_total:,.0f} COP
+
+🛢 Restante tanque:
+{restante:,.0f} COP
 
 """

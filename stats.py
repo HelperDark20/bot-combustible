@@ -3,6 +3,14 @@
 # ==========================================
 from database import cursor
 
+from fuel import (
+
+    calcular_gasto_combustible_total,
+
+    calcular_combustible_restante
+
+)
+
 # ==========================================
 # OBTENER STATS
 # ==========================================
@@ -88,6 +96,22 @@ def obtener_estadisticas():
     cancelados = cursor.fetchone()[0]
 
     # ======================================
+    # COMBUSTIBLE
+    # ======================================
+
+    gasto_combustible = (
+        calcular_gasto_combustible_total()
+    )
+
+    combustible_restante = (
+        calcular_combustible_restante()
+    )
+
+    ganancia_neta = (
+        dinero_total - gasto_combustible
+    )
+
+    # ======================================
     # RESPUESTA
     # ======================================
 
@@ -103,8 +127,17 @@ def obtener_estadisticas():
 
         f"🚫 Cancelados:\n{cancelados}\n\n"
 
-        f"💰 Ganancia:\n"
-        f"{dinero_total:,} COP\n\n"
+        f"💰 Ganancia bruta:\n"
+        f"{dinero_total:,.0f} COP\n\n"
+
+        f"⛽ Gasto combustible:\n"
+        f"{gasto_combustible:,.0f} COP\n\n"
+
+        f"🛢 Combustible restante:\n"
+        f"{combustible_restante:,.0f} COP\n\n"
+
+        f"💵 Ganancia neta:\n"
+        f"{ganancia_neta:,.0f} COP\n\n"
 
         f"⭐ Score promedio:\n"
         f"{promedio}/10"
