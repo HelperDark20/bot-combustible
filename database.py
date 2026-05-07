@@ -180,3 +180,17 @@ def obtener_viajes():
         })
 
     return viajes
+
+# ==========================================
+# REINICIAR DÍA
+# ==========================================
+
+def reiniciar_dia():
+
+    cursor.execute("""
+
+    DELETE FROM viajes
+
+    """)
+
+    conn.commit()
