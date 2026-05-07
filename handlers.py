@@ -19,7 +19,8 @@ from telegram_ui import (
 )
 
 from state import (
-    usuarios_esperando_foto
+    usuarios_esperando_foto,
+    usuarios_configurando
 )
 
 from database import (
@@ -41,7 +42,10 @@ from stats import (
 )
 
 from fuel import (
-    obtener_resumen_combustible
+
+    obtener_resumen_combustible,
+
+    guardar_config
 )
 
 # =========================================
@@ -107,9 +111,9 @@ async def botones_callback(
         for viaje in viajes:
 
             texto += (
-                f"💰 {viaje['ganancia']:,.0f} COP\n"
-                f"📍 {viaje['distancia']} km\n"
-                f"⭐ {viaje['score']}/10\n\n"
+                f"💰 {viaje['dinero']:,.0f} COP\n"
+                f"📍 {viaje['distancia_total']} km\n"
+                f"⭐ {viaje['score_visual']}/10\n\n"
             )
 
         await query.message.reply_text(
@@ -134,10 +138,87 @@ async def botones_callback(
 
     elif query.data == "config":
 
+        keyboard = InlineKeyboardMarkup([
+
+            [
+
+                InlineKeyboardButton(
+                    "⛽ KM/L",
+                    callback_data="set_kml"
+                )
+
+            ],
+
+            [
+
+                InlineKeyboardButton(
+                    "💰 Valor galón",
+                    callback_data="set_galon"
+                )
+
+            ],
+
+            [
+
+                InlineKeyboardButton(
+                    "🛢 Tanque",
+                    callback_data="set_tanque"
+                )
+
+            ]
+
+        ])
+
         texto = obtener_resumen_combustible()
 
         await query.message.reply_text(
-            texto
+
+            texto,
+
+            reply_markup=keyboard
+
+        )
+
+    # =====================================
+    # CAMBIAR KM/L
+    # =====================================
+
+    elif query.data == "set_kml":
+
+        usuarios_configurando[
+            query.from_user.id
+        ] = "km_l"
+
+        await query.message.reply_text(
+            "⛽ Envía nuevo KM/L"
+        )
+
+    # =====================================
+    # CAMBIAR GALÓN
+    # =====================================
+
+    elif query.data == "set_galon":
+
+        usuarios_configurando[
+            query.from_user.id
+        ] = "valor_galon"
+
+        await query.message.reply_text(
+            "💰 Envía nuevo valor galón"
+        )
+
+    # =====================================
+    # CAMBIAR TANQUE
+    # =====================================
+
+    elif query.data == "set_tanque":
+
+        usuarios_configurando[
+            query.from_user.id
+        ] = "tanque"
+
+        await query.message.reply_text(
+            "🛢 Envía nuevo valor tanque"
         )
 
     # =====================================
@@ -171,6 +252,52 @@ async def botones_callback(
         await query.message.reply_text(
             "❌ Viaje rechazado."
         )
+
+# =========================================
+# RECIBIR TEXTO CONFIG
+# =========================================
+
+async def recibir_texto(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    user_id = update.message.from_user.id
+
+    if user_id not in usuarios_configurando:
+        return
+
+    clave = usuarios_configurando[user_id]
+
+    try:
+
+        valor = float(
+            update.message.text
+        )
+
+    except:
+
+        await update.message.reply_text(
+            "❌ Envía solo números."
+        )
+
+        return
+
+    guardar_config(
+        clave,
+        valor
+    )
+
+    del usuarios_configurando[user_id]
+
+    texto = obtener_resumen_combustible()
+
+    await update.message.reply_text(
+
+        "✅ Configuración actualizada.\n"
+        + texto
+
+    )
 
 # =========================================
 # RECIBIR IMAGEN
@@ -220,18 +347,27 @@ async def recibir_imagen(
 
         return
 
-    tipo = datos.get("tipo", "Desconocido")
+    tipo = datos.get(
+        "tipo_viaje",
+        "Desconocido"
+    )
 
     ganancia = float(
-        datos.get("ganancia", 0)
+        datos.get("dinero", 0)
     )
 
     distancia = float(
-        datos.get("distancia", 0)
+        datos.get(
+            "distancia_destino_km",
+            0
+        )
     )
 
     tiempo = int(
-        datos.get("tiempo", 0)
+        datos.get(
+            "tiempo_destino_min",
+            0
+        )
     )
 
     score, mensaje = calcular_score(
@@ -249,15 +385,7 @@ async def recibir_imagen(
         if tiempo > 0 else 0
     )
 
-    viaje_id = guardar_viaje(
-
-        tipo=tipo,
-        ganancia=ganancia,
-        distancia=distancia,
-        tiempo=tiempo,
-        score=score
-
-    )
+    viaje_id = guardar_viaje(datos)
 
     keyboard = InlineKeyboardMarkup([
 
