@@ -126,3 +126,57 @@ def guardar_viaje(data):
     conn.commit()
 
     return cursor.lastrowid
+
+# ==========================================
+# OBTENER VIAJES
+# ==========================================
+
+def obtener_viajes():
+
+    cursor.execute("""
+
+    SELECT *
+
+    FROM viajes
+
+    ORDER BY id DESC
+
+    """)
+
+    resultados = cursor.fetchall()
+
+    viajes = []
+
+    for viaje in resultados:
+
+        viajes.append({
+
+            "id": viaje[0],
+
+            "fecha": viaje[1],
+
+            "tipo_viaje": viaje[2],
+
+            "dinero": viaje[3],
+
+            "distancia_recogida": viaje[4],
+
+            "distancia_destino": viaje[5],
+
+            "tiempo_recogida": viaje[6],
+
+            "tiempo_destino": viaje[7],
+
+            "distancia_total": viaje[8],
+
+            "tiempo_total": viaje[9],
+
+            "score": viaje[10],
+
+            "score_visual": viaje[11],
+
+            "estado": viaje[12]
+
+        })
+
+    return viajes
