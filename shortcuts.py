@@ -10,7 +10,7 @@ from flask import (
 
 from telegram_ui import botones_viaje
 
-from ocr import analizar_imagen_gpt
+from ocr import analizar_imagen_openai
 
 from database import guardar_viaje
 
@@ -81,7 +81,7 @@ def upload():
         # GPT VISION
         # ==================================
 
-        respuesta_gpt = analizar_imagen_gpt(
+        respuesta_gpt = analizar_imagen_openai(
             ruta
         )
 
