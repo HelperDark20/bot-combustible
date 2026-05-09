@@ -167,4 +167,26 @@ def construir_respuesta(data):
         f"{estado_score}"
     )
 
-    return respuesta
+    return {
+
+        "texto": respuesta,
+
+        "distancia_total":
+            distancia_total,
+
+        "tiempo_total":
+            tiempo_total,
+
+        "dinero_por_km":
+            dinero_por_km,
+
+        "dinero_por_min":
+            dinero_por_min,
+
+        "score_visual":
+            score_visual,
+
+        "estado_score":
+            estado_score
+
+    }

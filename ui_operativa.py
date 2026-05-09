@@ -9,13 +9,7 @@ from telegram import (
 
 )
 
-from state import (
-
-    viaje_en_curso,
-    viaje_pendiente,
-    vista_actual
-
-)
+import state
 
 # ==========================================
 # RENDER PANEL OPERATIVO
@@ -31,7 +25,7 @@ def render_operativo():
     # BOTONES SUPERIORES
     # ======================================
 
-    if viaje_en_curso and viaje_pendiente:
+    if state.viaje_en_curso and state.viaje_pendiente:
 
         keyboard.append([
 
@@ -53,13 +47,13 @@ def render_operativo():
 
     viaje = None
 
-    if vista_actual == "curso":
+    if state.vista_actual == "curso":
 
-        viaje = viaje_en_curso
+        viaje = state.viaje_en_curso
 
-    elif vista_actual == "pendiente":
+    elif state.vista_actual == "pendiente":
 
-        viaje = viaje_pendiente
+        viaje = state.viaje_pendiente
 
     # ======================================
     # SI NO HAY VIAJES
