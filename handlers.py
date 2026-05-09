@@ -16,7 +16,8 @@ from telegram.ext import (
 
 from telegram_ui import (
     menu_principal,
-    botones_iniciado
+    botones_iniciado,
+    menu_historial
 )
 
 from state import (
@@ -239,6 +240,21 @@ async def botones_callback(
 
             "📅 Ingresa la fecha a borrar:\n\n"
             "DD/MM/AAAA"
+
+        )
+
+    # =====================================
+    # HISTORIAL
+    # =====================================
+
+    elif query.data == "historial":
+
+        await query.message.reply_text(
+
+            "📅 HISTORIAL\n\n"
+            "Selecciona una opción:",
+
+            reply_markup=menu_historial()
 
         )
 

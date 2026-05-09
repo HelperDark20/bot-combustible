@@ -17,8 +17,8 @@ def menu_principal():
 
         [
             InlineKeyboardButton(
-                "🚘 Ver viajes",
-                callback_data="ver_viajes"
+                "📅 Historial",
+                callback_data="historial"
             )
         ],
 
@@ -42,6 +42,65 @@ def menu_principal():
                 callback_data="reiniciar"
             )
         ]
+    ]
+
+    return InlineKeyboardMarkup(
+        keyboard
+    )
+
+# ==========================================
+# MENÚ HISTORIAL
+# ==========================================
+
+def menu_historial():
+
+    keyboard = [
+
+        [
+
+            InlineKeyboardButton(
+                "📆 Hoy",
+                callback_data="historial_hoy"
+            )
+
+        ],
+
+        [
+
+            InlineKeyboardButton(
+                "📅 Semana",
+                callback_data="historial_semana"
+            )
+
+        ],
+
+        [
+
+            InlineKeyboardButton(
+                "🗓 Mes",
+                callback_data="historial_mes"
+            )
+
+        ],
+
+        [
+
+            InlineKeyboardButton(
+                "📈 Total",
+                callback_data="historial_total"
+            )
+
+        ],
+
+        [
+
+            InlineKeyboardButton(
+                "⬅️ Volver",
+                callback_data="volver_menu"
+            )
+
+        ]
+
     ]
 
     return InlineKeyboardMarkup(
