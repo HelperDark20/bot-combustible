@@ -22,7 +22,6 @@ from handlers import (
 
     start,
     botones_callback,
-    recibir_imagen,
     recibir_texto
 )
 
