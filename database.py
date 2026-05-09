@@ -5,7 +5,17 @@ import sqlite3
 
 from datetime import datetime
 
+import pytz
+
 from score import calcular_score
+
+# ==========================================
+# TIMEZONE COLOMBIA
+# ==========================================
+
+zona_colombia = pytz.timezone(
+    "America/Bogota"
+)
 
 # ==========================================
 # SQLITE
@@ -221,9 +231,9 @@ def borrar_dia(fecha):
 
 def actualizar_estado(viaje_id, estado):
 
-    from datetime import datetime
-
-    ahora = datetime.now().strftime(
+    ahora = datetime.now(
+        zona_colombia
+    ).strftime(
         "%Y-%m-%d %H:%M:%S"
     )
 

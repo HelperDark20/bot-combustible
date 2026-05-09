@@ -17,13 +17,6 @@ def menu_principal():
 
         [
             InlineKeyboardButton(
-                "📸 Analizar viaje",
-                callback_data="analizar"
-            )
-        ],
-
-        [
-            InlineKeyboardButton(
                 "🚘 Ver viajes",
                 callback_data="ver_viajes"
             )

@@ -21,7 +21,8 @@ from telegram_ui import (
 
 from state import (
     usuarios_esperando_foto,
-    usuarios_configurando
+    usuarios_configurando,
+    usuarios_borrando_fecha
 )
 
 from database import (
@@ -225,15 +226,20 @@ async def botones_callback(
         )
 
     # =====================================
-    # REINICIAR
+    # REINICIAR DÍA
     # =====================================
 
     elif query.data == "reiniciar":
 
-        reiniciar_dia()
+        usuarios_borrando_fecha.add(
+            query.from_user.id
+        )
 
         await query.message.reply_text(
-            "🗑 Día reiniciado."
+
+            "📅 Ingresa la fecha a borrar:\n\n"
+            "DD/MM/AAAA"
+
         )
 
     # =====================================
@@ -308,6 +314,44 @@ async def recibir_texto(
 ):
 
     user_id = update.message.from_user.id
+
+        # =====================================
+    # BORRAR FECHA
+    # =====================================
+
+    if user_id in usuarios_borrando_fecha:
+
+        try:
+
+            fecha = update.message.text
+
+            dia, mes, anio = fecha.split("/")
+
+            fecha_sql = (
+                f"{anio}-{mes}-{dia}"
+            )
+
+            borrar_dia(fecha_sql)
+
+            usuarios_borrando_fecha.remove(
+                user_id
+            )
+
+            await update.message.reply_text(
+
+                f"🗑 Día borrado:\n{fecha}"
+
+            )
+
+        except:
+
+            await update.message.reply_text(
+
+                "❌ Usa formato:\nDD/MM/AAAA"
+
+            )
+
+        return
 
     if user_id not in usuarios_configurando:
         return
