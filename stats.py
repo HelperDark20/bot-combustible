@@ -12,6 +12,100 @@ from fuel import (
 )
 
 # ==========================================
+# ESTADÍSTICAS HOY
+# ==========================================
+
+def obtener_estadisticas_hoy():
+
+    cursor.execute("""
+
+    SELECT COUNT(*)
+
+    FROM viajes
+
+    WHERE DATE(fecha) = DATE('now', '-5 hours')
+
+    """)
+
+    viajes = cursor.fetchone()[0]
+
+    # ======================================
+    # COMPLETADOS
+    # ======================================
+
+    cursor.execute("""
+
+    SELECT COUNT(*)
+
+    FROM viajes
+
+    WHERE estado='completado'
+
+    AND DATE(fecha) = DATE('now', '-5 hours')
+
+    """)
+
+    completados = cursor.fetchone()[0]
+
+    # ======================================
+    # CANCELADOS
+    # ======================================
+
+    cursor.execute("""
+
+    SELECT COUNT(*)
+
+    FROM viajes
+
+    WHERE estado='cancelado'
+
+    AND DATE(fecha) = DATE('now', '-5 hours')
+
+    """)
+
+    cancelados = cursor.fetchone()[0]
+
+    # ======================================
+    # GANANCIA TOTAL
+    # ======================================
+
+    cursor.execute("""
+
+    SELECT SUM(dinero)
+
+    FROM viajes
+
+    WHERE estado='completado'
+
+    AND DATE(fecha) = DATE('now', '-5 hours')
+
+    """)
+
+    ganancia_total = cursor.fetchone()[0]
+
+    if ganancia_total is None:
+
+        ganancia_total = 0
+
+    return (
+
+        "📆 HISTORIAL HOY\n\n"
+
+        f"🚘 Viajes:\n"
+        f"{viajes}\n\n"
+
+        f"✅ Completados:\n"
+        f"{completados}\n\n"
+
+        f"🚫 Cancelados:\n"
+        f"{cancelados}\n\n"
+
+        f"💰 Ganancia:\n"
+        f"{ganancia_total:,.0f} COP"
+
+    )
+
+# ==========================================
 # OBTENER STATS
 # ==========================================
 def obtener_estadisticas():

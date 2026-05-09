@@ -43,7 +43,8 @@ from score import (
 )
 
 from stats import (
-    obtener_estadisticas
+    obtener_estadisticas,
+    obtener_estadisticas_hoy
 )
 
 from fuel import (
@@ -82,54 +83,10 @@ async def botones_callback(
     await query.answer()
 
     # =====================================
-    # ANALIZAR
-    # =====================================
-
-    if query.data == "analizar":
-
-        usuarios_esperando_foto.add(
-            query.from_user.id
-        )
-
-        await query.message.reply_text(
-            "📸 Envíame la captura."
-        )
-
-    # =====================================
-    # VER VIAJES
-    # =====================================
-
-    elif query.data == "ver_viajes":
-
-        viajes = obtener_viajes()
-
-        if not viajes:
-
-            await query.message.reply_text(
-                "❌ No hay viajes guardados."
-            )
-
-            return
-
-        texto = "🚗 VIAJES DEL DÍA\n\n"
-
-        for viaje in viajes:
-
-            texto += (
-                f"💰 {viaje['dinero']:,.0f} COP\n"
-                f"📍 {viaje['distancia_total']} km\n"
-                f"⭐ {viaje['score_visual']}/10\n\n"
-            )
-
-        await query.message.reply_text(
-            texto
-        )
-
-    # =====================================
     # ESTADÍSTICAS
     # =====================================
 
-    elif query.data == "stats":
+    if query.data == "stats":
 
         texto = obtener_estadisticas()
 
@@ -224,6 +181,18 @@ async def botones_callback(
 
         await query.message.reply_text(
             "🛢 Envía nuevo valor tanque"
+        )
+
+    # =====================================
+    # HISTORIAL HOY
+    # =====================================
+
+    elif query.data == "historial_hoy":
+
+        texto = obtener_estadisticas_hoy()
+
+        await query.message.reply_text(
+            texto
         )
 
     # =====================================
@@ -331,7 +300,7 @@ async def recibir_texto(
 
     user_id = update.message.from_user.id
 
-        # =====================================
+    # =====================================
     # BORRAR FECHA
     # =====================================
 
@@ -497,13 +466,13 @@ async def recibir_imagen(
         [
 
             InlineKeyboardButton(
-                "✅ Aceptado",
-                callback_data=f"aceptado_{viaje_id}"
+                "🚖 Iniciar viaje",
+                callback_data=f"iniciar_{viaje_id}"
             ),
 
             InlineKeyboardButton(
-                "❌ Rechazado",
-                callback_data=f"rechazado_{viaje_id}"
+                "🚫 Cancelado",
+                callback_data=f"cancelado_{viaje_id}"
             )
 
         ]
