@@ -108,6 +108,56 @@ def menu_historial():
     )
 
 # ==========================================
+# MENÚ CONFIGURACIÓN
+# ==========================================
+
+def menu_configuracion():
+
+    keyboard = [
+
+        [
+
+            InlineKeyboardButton(
+                "⛽ KM/L",
+                callback_data="set_kml"
+            )
+
+        ],
+
+        [
+
+            InlineKeyboardButton(
+                "💰 Valor galón",
+                callback_data="set_galon"
+            )
+
+        ],
+
+        [
+
+            InlineKeyboardButton(
+                "🛢 Tanque",
+                callback_data="set_tanque"
+            )
+
+        ],
+
+        [
+
+            InlineKeyboardButton(
+                "⬅️ Volver",
+                callback_data="volver_menu"
+            )
+
+        ]
+
+    ]
+
+    return InlineKeyboardMarkup(
+        keyboard
+    )
+
+# ==========================================
 # BOTONES ESTADO PENDIENTE
 # ==========================================
 

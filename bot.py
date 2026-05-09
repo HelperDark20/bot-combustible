@@ -23,8 +23,7 @@ from handlers import (
     start,
     botones_callback,
     recibir_imagen,
-    recibir_texto,
-    borrar_fecha
+    recibir_texto
 )
 
 from shortcuts import flask_app
@@ -54,13 +53,6 @@ telegram_app = (
 # ==========================================
 telegram_app.add_handler(
     CommandHandler("start", start)
-)
-
-telegram_app.add_handler(
-    CommandHandler(
-        "borrar",
-        borrar_fecha
-    )
 )
 
 telegram_app.add_handler(

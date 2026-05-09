@@ -5,9 +5,7 @@
 import json
 
 from telegram import (
-    Update,
-    InlineKeyboardMarkup,
-    InlineKeyboardButton
+    Update
 )
 
 from telegram.ext import (
@@ -17,19 +15,18 @@ from telegram.ext import (
 from telegram_ui import (
     menu_principal,
     botones_iniciado,
-    menu_historial
+    menu_historial,
+    botones_pendiente,
+    menu_configuracion
 )
 
 from state import (
-    usuarios_esperando_foto,
     usuarios_configurando,
     usuarios_borrando_fecha
 )
 
 from database import (
     guardar_viaje,
-    obtener_viajes,
-    reiniciar_dia,
     actualizar_estado,
     borrar_dia
 )
@@ -44,7 +41,9 @@ from score import (
 
 from stats import (
     obtener_estadisticas,
-    obtener_estadisticas_hoy
+    obtener_estadisticas_hoy,
+    obtener_estadisticas_semana,
+    obtener_estadisticas_mes
 )
 
 from fuel import (
@@ -100,36 +99,7 @@ async def botones_callback(
 
     elif query.data == "config":
 
-        keyboard = InlineKeyboardMarkup([
-
-            [
-
-                InlineKeyboardButton(
-                    "⛽ KM/L",
-                    callback_data="set_kml"
-                )
-
-            ],
-
-            [
-
-                InlineKeyboardButton(
-                    "💰 Valor galón",
-                    callback_data="set_galon"
-                )
-
-            ],
-
-            [
-
-                InlineKeyboardButton(
-                    "🛢 Tanque",
-                    callback_data="set_tanque"
-                )
-
-            ]
-
-        ])
+        keyboard = menu_configuracion()
 
         texto = obtener_resumen_combustible()
 
@@ -196,6 +166,42 @@ async def botones_callback(
         )
 
     # =====================================
+    # HISTORIAL SEMANA
+    # =====================================
+
+    elif query.data == "historial_semana":
+
+        texto = obtener_estadisticas_semana()
+
+        await query.message.reply_text(
+            texto
+        )
+
+    # =====================================
+    # HISTORIAL MES
+    # =====================================
+
+    elif query.data == "historial_mes":
+
+        texto = obtener_estadisticas_mes()
+
+        await query.message.reply_text(
+            texto
+        )
+
+    # =====================================
+    # HISTORIAL TOTAL
+    # =====================================
+
+    elif query.data == "historial_total":
+
+        texto = obtener_estadisticas()
+
+        await query.message.reply_text(
+            texto
+        )
+
+    # =====================================
     # REINICIAR DÍA
     # =====================================
 
@@ -224,6 +230,21 @@ async def botones_callback(
             "Selecciona una opción:",
 
             reply_markup=menu_historial()
+
+        )
+
+    # =====================================
+    # VOLVER MENÚ
+    # =====================================
+
+    elif query.data == "volver_menu":
+
+        await query.message.reply_text(
+
+            "🚖 BOT IA VIAJES\n\n"
+            "Selecciona una opción:",
+
+            reply_markup=menu_principal()
 
         )
 
@@ -382,13 +403,6 @@ async def recibir_imagen(
     context: ContextTypes.DEFAULT_TYPE
 ):
 
-    user_id = update.message.from_user.id
-
-    if user_id not in usuarios_esperando_foto:
-        return
-
-    usuarios_esperando_foto.remove(user_id)
-
     foto = update.message.photo[-1]
 
     archivo = await foto.get_file()
@@ -444,40 +458,20 @@ async def recibir_imagen(
         )
     )
 
-    score, mensaje = calcular_score(
-        ganancia,
-        distancia
-    )
-
-    cop_km = (
-        ganancia / distancia
-        if distancia > 0 else 0
-    )
-
-    cop_min = (
-        ganancia / tiempo
-        if tiempo > 0 else 0
-    )
+    (
+        distancia_total,
+        tiempo_total,
+        dinero_por_km,
+        dinero_por_min,
+        score_visual,
+        estado_score
+    ) = calcular_score(datos)
 
     viaje_id = guardar_viaje(datos)
 
-    keyboard = InlineKeyboardMarkup([
-
-        [
-
-            InlineKeyboardButton(
-                "🚖 Iniciar viaje",
-                callback_data=f"iniciar_{viaje_id}"
-            ),
-
-            InlineKeyboardButton(
-                "🚫 Cancelado",
-                callback_data=f"cancelado_{viaje_id}"
-            )
-
-        ]
-
-    ])
+    keyboard = botones_pendiente(
+        viaje_id
+    )
 
     texto = f"""
 📲 VIA SHORTCUTS
@@ -488,50 +482,15 @@ async def recibir_imagen(
 📍 {distancia} km
 ⏱ {tiempo} min
 
-💸 {cop_km:,.0f} COP/km
-⌛ {cop_min:,.0f} COP/min
+💸 {dinero_por_km:,.0f} COP/km
+⌛ {dinero_por_min:,.0f} COP/min
 
-⭐ Score: {score}/10
+⭐ Score: {score_visual}/10
 
-🔥 {mensaje}
+🔥 {estado_score}
 """
 
     await update.message.reply_text(
         texto,
         reply_markup=keyboard
     )
-
-# =========================================
-# BORRAR FECHA
-# =========================================
-
-async def borrar_fecha(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    try:
-
-        fecha = context.args[0]
-
-        dia, mes, anio = fecha.split("/")
-
-        fecha_sql = (
-            f"{anio}-{mes}-{dia}"
-        )
-
-        borrar_dia(fecha_sql)
-
-        await update.message.reply_text(
-
-            f"🗑 Estadísticas borradas:\n{fecha}"
-
-        )
-
-    except:
-
-        await update.message.reply_text(
-
-            "❌ Usa:\n/borrar 09/05/2026"
-
-        )

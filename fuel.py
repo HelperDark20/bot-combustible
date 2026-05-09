@@ -11,9 +11,7 @@ from config import (
     DEFAULT_TANQUE
 )
 
-from database import (
-    obtener_viajes
-)
+from database import cursor
 
 # =========================================
 # CREAR TABLA CONFIG
@@ -144,21 +142,27 @@ def calcular_ganancia_neta(
 
 def calcular_gasto_combustible_total():
 
-    viajes = obtener_viajes()
-
     costo_km = calcular_costo_km()
 
-    gasto_total = 0
+    cursor.execute("""
 
-    for viaje in viajes:
+    SELECT SUM(distancia_total)
 
-        distancia = viaje[
-            "distancia_total"
-        ]
+    FROM viajes
 
-        gasto_total += (
-            distancia * costo_km
-        )
+    WHERE estado='completado'
+
+    """)
+
+    resultado = cursor.fetchone()[0]
+
+    if resultado is None:
+
+        resultado = 0
+
+    gasto_total = (
+        resultado * costo_km
+    )
 
     return round(gasto_total, 2)
 

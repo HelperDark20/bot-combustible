@@ -22,8 +22,6 @@ from config import (
     CHAT_ID
 )
 
-from telegram import InlineKeyboardMarkup
-
 import requests
 import json
 
@@ -57,9 +55,6 @@ def upload():
         # ==================================
         # VALIDAR IMAGEN
         # ==================================
-
-        print("FILES:", request.files)
-        print("FORM:", request.form)
 
         if "file" not in request.files:
 
