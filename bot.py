@@ -64,14 +64,6 @@ telegram_app.add_handler(
 telegram_app.add_handler(
 
     MessageHandler(
-        filters.PHOTO,
-        recibir_imagen
-    )
-)
-
-telegram_app.add_handler(
-
-    MessageHandler(
 
         filters.TEXT
         & ~filters.COMMAND,
