@@ -88,28 +88,10 @@ def render_operativo():
     )
 
     # ======================================
-    # BOTONES VIAJE
+    # BOTONES SEGÚN VISTA
     # ======================================
 
-    estado = viaje.get("estado_operativo")
-
-    if estado == "pendiente":
-
-        keyboard.append([
-
-            InlineKeyboardButton(
-                "🚘 Iniciar Viaje",
-                callback_data="iniciar_viaje"
-            ),
-
-            InlineKeyboardButton(
-                "🚫 Cancelar",
-                callback_data="cancelar_viaje"
-            )
-
-        ])
-
-    elif estado == "curso":
+    if state.vista_actual == "curso":
 
         keyboard.append([
 
@@ -125,6 +107,18 @@ def render_operativo():
 
         ])
 
-    return texto, InlineKeyboardMarkup(
-        keyboard
-    )
+    elif state.vista_actual == "pendiente":
+
+        keyboard.append([
+
+            InlineKeyboardButton(
+                "🚘 Iniciar Viaje",
+                callback_data="iniciar_viaje"
+            ),
+
+            InlineKeyboardButton(
+                "🚫 Cancelar",
+                callback_data="cancelar_viaje"
+            )
+
+        ])

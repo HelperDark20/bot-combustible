@@ -2,7 +2,11 @@
 # HANDLERS.PY
 # =========================================
 
-import json
+import state
+
+from ui_operativa import (
+    render_operativo
+)
 
 from telegram import (
     Update
@@ -14,9 +18,7 @@ from telegram.ext import (
 
 from telegram_ui import (
     menu_principal,
-    botones_iniciado,
     menu_historial,
-    botones_pendiente,
     menu_configuracion
 )
 
@@ -26,17 +28,7 @@ from state import (
 )
 
 from database import (
-    guardar_viaje,
-    actualizar_estado,
     borrar_dia
-)
-
-from ocr import (
-    analizar_imagen_openai
-)
-
-from score import (
-    calcular_score
 )
 
 from stats import (
@@ -80,6 +72,200 @@ async def botones_callback(
     query = update.callback_query
 
     await query.answer()
+
+    # ======================================
+    # VER VIAJE EN CURSO
+    # ======================================
+
+    if query.data == "ver_curso":
+
+        state.vista_actual = "curso"
+
+        texto, reply_markup = (
+            render_operativo()
+        )
+
+        await query.edit_message_text(
+
+            text=texto,
+
+            reply_markup=reply_markup
+
+        )
+
+    # ======================================
+    # VER VIAJE PENDIENTE
+    # ======================================
+
+    elif query.data == "ver_pendiente":
+
+        state.vista_actual = "pendiente"
+
+        texto, reply_markup = (
+            render_operativo()
+        )
+
+        await query.edit_message_text(
+
+            text=texto,
+
+            reply_markup=reply_markup
+
+        )
+
+    # ======================================
+    # INICIAR VIAJE
+    # ======================================
+
+    elif query.data == "iniciar_viaje":
+
+        # ==================================
+        # SI HAY PENDIENTE
+        # ==================================
+
+        if state.viaje_pendiente:
+
+            state.viaje_en_curso = (
+                state.viaje_pendiente
+            )
+
+            state.viaje_pendiente = None
+
+        # ==================================
+        # INICIAR ACTUAL
+        # ==================================
+
+        if state.viaje_en_curso:
+
+            state.viaje_en_curso[
+                "estado_operativo"
+            ] = "curso"
+
+        state.vista_actual = "curso"
+
+        # ==================================
+        # RERENDER
+        # ==================================
+
+        texto, reply_markup = (
+            render_operativo()
+        )
+
+        await query.edit_message_text(
+
+            text=texto,
+
+            reply_markup=reply_markup
+
+        )
+
+    # ======================================
+    # FINALIZAR VIAJE
+    # ======================================
+
+    elif query.data == "finalizar_viaje":
+
+        # ==================================
+        # SI HAY PENDIENTE
+        # ==================================
+
+        if state.viaje_pendiente:
+
+            state.viaje_en_curso = (
+                state.viaje_pendiente
+            )
+
+            state.viaje_pendiente = None
+
+            state.viaje_en_curso[
+                "estado_operativo"
+            ] = "curso"
+
+            state.vista_actual = "curso"
+
+        # ==================================
+        # SI NO HAY MÁS VIAJES
+        # ==================================
+
+        else:
+
+            state.viaje_en_curso = None
+
+            state.vista_actual = "curso"
+
+        # ==================================
+        # RERENDER
+        # ==================================
+
+        texto, reply_markup = (
+            render_operativo()
+        )
+
+        await query.edit_message_text(
+
+            text=texto,
+
+            reply_markup=reply_markup
+
+        )
+
+    # ======================================
+    # CANCELAR VIAJE
+    # ======================================
+
+    elif query.data == "cancelar_viaje":
+
+        # ==================================
+        # CANCELAR VIAJE EN CURSO
+        # ==================================
+
+        if state.vista_actual == "curso":
+
+            # si hay pendiente → pasa a curso
+
+            if state.viaje_pendiente:
+
+                state.viaje_en_curso = (
+                    state.viaje_pendiente
+                )
+
+                state.viaje_pendiente = None
+
+                state.viaje_en_curso[
+                    "estado_operativo"
+                ] = "curso"
+
+            # si no hay más viajes
+
+            else:
+
+                state.viaje_en_curso = None
+
+        # ==================================
+        # CANCELAR PENDIENTE
+        # ==================================
+
+        elif state.vista_actual == "pendiente":
+
+            state.viaje_pendiente = None
+
+            state.vista_actual = "curso"
+
+        # ==================================
+        # RERENDER
+        # ==================================
+
+        texto, reply_markup = (
+            render_operativo()
+        )
+
+        await query.edit_message_text(
+
+            text=texto,
+
+            reply_markup=reply_markup
+
+        )
 
     # =====================================
     # ESTADÍSTICAS
@@ -248,67 +434,67 @@ async def botones_callback(
 
         )
 
-    # =====================================
-    # INICIAR VIAJE
-    # =====================================
+    # # =====================================
+    # # INICIAR VIAJE
+    # # =====================================
 
-    elif query.data.startswith("iniciar_"):
+    # elif query.data.startswith("iniciar_"):
 
-        viaje_id = int(
-            query.data.split("_")[1]
-        )
+    #     viaje_id = int(
+    #         query.data.split("_")[1]
+    #     )
 
-        actualizar_estado(
-            viaje_id,
-            "iniciado"
-        )
+    #     actualizar_estado(
+    #         viaje_id,
+    #         "iniciado"
+    #     )
 
-        await query.message.reply_text(
+    #     await query.message.reply_text(
 
-            "🚖 Viaje iniciado.",
+    #         "🚖 Viaje iniciado.",
 
-            reply_markup=botones_iniciado(
-                viaje_id
-            )
-        )
+    #         reply_markup=botones_iniciado(
+    #             viaje_id
+    #         )
+    #     )
 
-    # =====================================
-    # FINALIZAR VIAJE
-    # =====================================
+    # # =====================================
+    # # FINALIZAR VIAJE
+    # # =====================================
 
-    elif query.data.startswith("finalizar_"):
+    # elif query.data.startswith("finalizar_"):
 
-        viaje_id = int(
-            query.data.split("_")[1]
-        )
+    #     viaje_id = int(
+    #         query.data.split("_")[1]
+    #     )
 
-        actualizar_estado(
-            viaje_id,
-            "completado"
-        )
+    #     actualizar_estado(
+    #         viaje_id,
+    #         "completado"
+    #     )
 
-        await query.message.reply_text(
-            "✅ Viaje finalizado."
-        )
+    #     await query.message.reply_text(
+    #         "✅ Viaje finalizado."
+    #     )
 
-    # =====================================
-    # CANCELADO
-    # =====================================
+    # # =====================================
+    # # CANCELADO
+    # # =====================================
 
-    elif query.data.startswith("cancelado_"):
+    # elif query.data.startswith("cancelado_"):
 
-        viaje_id = int(
-            query.data.split("_")[1]
-        )
+    #     viaje_id = int(
+    #         query.data.split("_")[1]
+    #     )
 
-        actualizar_estado(
-            viaje_id,
-            "cancelado"
-        )
+    #     actualizar_estado(
+    #         viaje_id,
+    #         "cancelado"
+    #     )
 
-        await query.message.reply_text(
-            "🚫 Viaje cancelado."
-        )
+    #     await query.message.reply_text(
+    #         "🚫 Viaje cancelado."
+    #     )
 
 # =========================================
 # RECIBIR TEXTO CONFIG
@@ -394,103 +580,103 @@ async def recibir_texto(
 
     )
 
-# =========================================
-# RECIBIR IMAGEN
-# =========================================
+# # =========================================
+# # RECIBIR IMAGEN
+# # =========================================
 
-async def recibir_imagen(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
+# async def recibir_imagen(
+#     update: Update,
+#     context: ContextTypes.DEFAULT_TYPE
+# ):
 
-    foto = update.message.photo[-1]
+#     foto = update.message.photo[-1]
 
-    archivo = await foto.get_file()
+#     archivo = await foto.get_file()
 
-    ruta = "temp.jpg"
+#     ruta = "temp.jpg"
 
-    await archivo.download_to_drive(ruta)
+#     await archivo.download_to_drive(ruta)
 
-    resultado = analizar_imagen_openai(
-        ruta
-    )
+#     resultado = analizar_imagen_openai(
+#         ruta
+#     )
 
-    if not resultado:
+#     if not resultado:
 
-        await update.message.reply_text(
-            "❌ No pude analizar la imagen."
-        )
+#         await update.message.reply_text(
+#             "❌ No pude analizar la imagen."
+#         )
 
-        return
+#         return
 
-    try:
+#     try:
 
-        datos = json.loads(resultado)
+#         datos = json.loads(resultado)
 
-    except:
+#     except:
 
-        await update.message.reply_text(
-            "❌ Error leyendo datos IA."
-        )
+#         await update.message.reply_text(
+#             "❌ Error leyendo datos IA."
+#         )
 
-        return
+#         return
 
-    tipo = datos.get(
-        "tipo_viaje",
-        "Desconocido"
-    )
+#     tipo = datos.get(
+#         "tipo_viaje",
+#         "Desconocido"
+#     )
 
-    ganancia = float(
-        datos.get("dinero", 0)
-    )
+#     ganancia = float(
+#         datos.get("dinero", 0)
+#     )
 
-    distancia = float(
-        datos.get(
-            "distancia_destino_km",
-            0
-        )
-    )
+#     distancia = float(
+#         datos.get(
+#             "distancia_destino_km",
+#             0
+#         )
+#     )
 
-    tiempo = int(
-        datos.get(
-            "tiempo_destino_min",
-            0
-        )
-    )
+#     tiempo = int(
+#         datos.get(
+#             "tiempo_destino_min",
+#             0
+#         )
+#     )
 
-    (
-        distancia_total,
-        tiempo_total,
-        dinero_por_km,
-        dinero_por_min,
-        score_visual,
-        estado_score
-    ) = calcular_score(datos)
+#     (
+#         distancia_total,
+#         tiempo_total,
+#         dinero_por_km,
+#         dinero_por_min,
+#         score_visual,
+#         estado_score
+#     ) = calcular_score(datos)
 
-    viaje_id = guardar_viaje(datos)
+#     viaje_id = guardar_viaje(datos)
 
-    keyboard = botones_pendiente(
-        viaje_id
-    )
+#     keyboard = botones_pendiente(
+#         viaje_id
+#     )
 
-    texto = f"""
-📲 VIA SHORTCUTS
+#     texto = f"""
+# 📲 VIA SHORTCUTS
 
-🚘 {tipo}
+# 🚘 {tipo}
 
-💰 {ganancia:,.0f} COP
-📍 {distancia} km
-⏱ {tiempo} min
+# 💰 {ganancia:,.0f} COP
+# 📍 {distancia} km
+# ⏱ {tiempo} min
 
-💸 {dinero_por_km:,.0f} COP/km
-⌛ {dinero_por_min:,.0f} COP/min
+# 💸 {dinero_por_km:,.0f} COP/km
+# ⌛ {dinero_por_min:,.0f} COP/min
 
-⭐ Score: {score_visual}/10
+# ⭐ Score: {score_visual}/10
 
-🔥 {estado_score}
-"""
+# 🔥 {estado_score}
+# """
 
-    await update.message.reply_text(
-        texto,
-        reply_markup=keyboard
-    )
+#     await update.message.reply_text(
+#         texto,
+#         reply_markup=keyboard
+#     )
