@@ -1,6 +1,17 @@
 # ==========================================
 # IMPORTS
 # ==========================================
+from state import (
+
+    viaje_en_curso,
+    viaje_pendiente,
+    vista_actual,
+    message_id_operativo
+
+)
+
+import state
+
 from flask import (
 
     Flask,
@@ -8,13 +19,13 @@ from flask import (
     jsonify
 )
 
-from telegram_ui import botones_pendiente
-
 from ocr import analizar_imagen_openai
 
 from database import guardar_viaje
 
-from score import construir_respuesta
+from ui_operativa import (
+    render_operativo
+)
 
 from config import (
 
@@ -102,45 +113,99 @@ def upload():
         viaje_id = guardar_viaje(data)
 
         # ==================================
-        # RESPUESTA
+        # NUEVO VIAJE OPERATIVO
         # ==================================
 
-        respuesta = construir_respuesta(
-            data
-        )
+        nuevo_viaje = {
+
+            "ganancia": data["dinero"],
+
+            "distancia_total": 0,
+
+            "score_visual": 0,
+
+            "estado_score": "Pendiente",
+
+            "estado_operativo": "pendiente"
+
+        }
 
         # ==================================
-        # BOTONES
+        # LÓGICA OPERATIVA
         # ==================================
 
-        reply_markup = botones_pendiente(
-            viaje_id
-        )
+        if state.viaje_en_curso:
+
+            state.viaje_pendiente = nuevo_viaje
+
+            state.vista_actual = "pendiente"
+
+        else:
+
+            state.viaje_en_curso = nuevo_viaje
+
+            state.vista_actual = "curso"
 
         # ==================================
-        # ENVIAR TELEGRAM
+        # RENDER OPERATIVO
         # ==================================
 
-        requests.post(
+        texto, reply_markup = render_operativo()
 
-            f"https://api.telegram.org/bot{TOKEN}/sendMessage",
+        # ==================================
+        # ACTUALIZAR PANEL
+        # ==================================
 
-            json={
+        if state.message_id_operativo:
 
-                "chat_id": CHAT_ID,
+            requests.post(
 
-                "text":
-                    "📲 VIA SHORTCUTS\n\n"
-                    + respuesta,
+                f"https://api.telegram.org/bot{TOKEN}/editMessageText",
 
-                "reply_markup":
-                    reply_markup.to_dict()
-            }
-        )
+                json={
 
-        return jsonify({
-            "success": True
-        })
+                    "chat_id": CHAT_ID,
+
+                    "message_id":
+                        state.message_id_operativo,
+
+                    "text": texto,
+
+                    "reply_markup":
+                        reply_markup.to_dict()
+
+                }
+            )
+
+        # ==================================
+        # CREAR PANEL
+        # ==================================
+
+        else:
+
+            response = requests.post(
+
+                f"https://api.telegram.org/bot{TOKEN}/sendMessage",
+
+                json={
+
+                    "chat_id": CHAT_ID,
+
+                    "text": texto,
+
+                    "reply_markup":
+                        reply_markup.to_dict()
+
+                }
+            )
+
+            resultado = response.json()
+
+            state.message_id_operativo = (
+
+                resultado["result"]["message_id"]
+
+            )
 
     except Exception as e:
 
