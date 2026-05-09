@@ -12,6 +12,8 @@ from state import (
 
 import state
 
+from score import construir_respuesta
+
 from flask import (
 
     Flask,
@@ -113,6 +115,14 @@ def upload():
         viaje_id = guardar_viaje(data)
 
         # ==================================
+        # RESULTADO SCORE
+        # ==================================
+
+        resultado_score = construir_respuesta(
+            data
+        )
+
+        # ==================================
         # NUEVO VIAJE OPERATIVO
         # ==================================
 
@@ -120,13 +130,26 @@ def upload():
 
             "ganancia": data["dinero"],
 
-            "distancia_total": 0,
+            "distancia_total":
+                resultado_score["distancia_total"],
 
-            "score_visual": 0,
+            "tiempo_total":
+                resultado_score["tiempo_total"],
 
-            "estado_score": "Pendiente",
+            "dinero_por_km":
+                resultado_score["dinero_por_km"],
 
-            "estado_operativo": "pendiente"
+            "dinero_por_min":
+                resultado_score["dinero_por_min"],
+
+            "score_visual":
+                resultado_score["score_visual"],
+
+            "estado_score":
+                resultado_score["estado_score"],
+
+            "estado_operativo":
+                "pendiente"
 
         }
 
@@ -206,6 +229,10 @@ def upload():
                 resultado["result"]["message_id"]
 
             )
+
+        return jsonify({
+            "success": True
+        })
 
     except Exception as e:
 
