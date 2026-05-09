@@ -75,12 +75,14 @@ def render_operativo():
 
     texto = (
 
-        f"💰 {viaje['ganancia']:,.0f} COP\n\n"
+        f"💰 {viaje['ganancia']:,.0f} COP\n"
+        f"📍 {viaje['distancia_total']} km\n"
+        f"⏱ {viaje['tiempo_total']} min\n\n"
 
-        f"📍 {viaje['distancia_total']} km\n\n"
+        f"💵 {viaje['dinero_por_km']:,.0f} COP/KM\n"
+        f"💸 {viaje['dinero_por_min']:,.0f} COP/MIN\n\n"
 
-        f"⭐ {viaje['score_visual']}/10\n\n"
-
+        f"⭐ {viaje['score_visual']}/10\n"
         f"🔥 {viaje['estado_score']}"
 
     )
