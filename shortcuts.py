@@ -8,7 +8,7 @@ from flask import (
     jsonify
 )
 
-from telegram_ui import botones_viaje
+from telegram_ui import botones_pendiente
 
 from ocr import analizar_imagen_openai
 
@@ -118,7 +118,7 @@ def upload():
         # BOTONES
         # ==================================
 
-        reply_markup = botones_viaje(
+        reply_markup = botones_pendiente(
             viaje_id
         )
 

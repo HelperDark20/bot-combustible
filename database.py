@@ -50,7 +50,11 @@ CREATE TABLE IF NOT EXISTS viajes (
 
     score_visual INTEGER,
 
-    estado TEXT
+    estado TEXT,
+
+    hora_inicio TEXT,
+
+    hora_fin TEXT
 )
 
 """)
@@ -192,5 +196,104 @@ def reiniciar_dia():
     DELETE FROM viajes
 
     """)
+
+    conn.commit()
+
+# ==========================================
+# BORRAR DÍA ESPECÍFICO
+# ==========================================
+
+def borrar_dia(fecha):
+
+    cursor.execute("""
+
+    DELETE FROM viajes
+
+    WHERE DATE(fecha) = ?
+
+    """, (fecha,))
+
+    conn.commit()
+
+# ==========================================
+# ACTUALIZAR ESTADO
+# ==========================================
+
+def actualizar_estado(viaje_id, estado):
+
+    from datetime import datetime
+
+    ahora = datetime.now().strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+
+    # ======================================
+    # INICIADO
+    # ======================================
+
+    if estado == "iniciado":
+
+        cursor.execute("""
+
+        UPDATE viajes
+
+        SET
+            estado = ?,
+            hora_inicio = ?
+
+        WHERE id = ?
+
+        """, (
+
+            estado,
+            ahora,
+            viaje_id
+
+        ))
+
+    # ======================================
+    # COMPLETADO
+    # ======================================
+
+    elif estado == "completado":
+
+        cursor.execute("""
+
+        UPDATE viajes
+
+        SET
+            estado = ?,
+            hora_fin = ?
+
+        WHERE id = ?
+
+        """, (
+
+            estado,
+            ahora,
+            viaje_id
+
+        ))
+
+    # ======================================
+    # CANCELADO
+    # ======================================
+
+    else:
+
+        cursor.execute("""
+
+        UPDATE viajes
+
+        SET estado = ?
+
+        WHERE id = ?
+
+        """, (
+
+            estado,
+            viaje_id
+
+        ))
 
     conn.commit()

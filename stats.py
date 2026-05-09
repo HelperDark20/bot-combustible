@@ -34,7 +34,7 @@ def obtener_estadisticas():
     cursor.execute("""
     SELECT SUM(dinero)
     FROM viajes
-    WHERE estado='aceptado'
+    WHERE estado='completado'
     """)
 
     dinero_total = cursor.fetchone()[0]
@@ -49,7 +49,7 @@ def obtener_estadisticas():
     cursor.execute("""
     SELECT AVG(score_visual)
     FROM viajes
-    WHERE estado='aceptado'
+    WHERE estado='completado'
     """)
 
     promedio = cursor.fetchone()[0]
@@ -60,28 +60,16 @@ def obtener_estadisticas():
     promedio = round(promedio, 1)
 
     # ======================================
-    # ACEPTADOS
+    # COMPLETADOS
     # ======================================
 
     cursor.execute("""
     SELECT COUNT(*)
     FROM viajes
-    WHERE estado='aceptado'
+    WHERE estado='completado'
     """)
 
-    aceptados = cursor.fetchone()[0]
-
-    # ======================================
-    # RECHAZADOS
-    # ======================================
-
-    cursor.execute("""
-    SELECT COUNT(*)
-    FROM viajes
-    WHERE estado='rechazado'
-    """)
-
-    rechazados = cursor.fetchone()[0]
+    completados = cursor.fetchone()[0]
 
     # ======================================
     # CANCELADOS
@@ -121,9 +109,7 @@ def obtener_estadisticas():
 
         f"🚘 Viajes:\n{total}\n\n"
 
-        f"✅ Aceptados:\n{aceptados}\n\n"
-
-        f"❌ Rechazados:\n{rechazados}\n\n"
+        f"✅ Completados:\n{completados}\n\n"
 
         f"🚫 Cancelados:\n{cancelados}\n\n"
 

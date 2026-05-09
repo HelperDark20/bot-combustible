@@ -56,22 +56,23 @@ def menu_principal():
     )
 
 # ==========================================
-# BOTONES VIAJE
+# BOTONES ESTADO PENDIENTE
 # ==========================================
-def botones_viaje(viaje_id):
+
+def botones_pendiente(viaje_id):
 
     keyboard = [
 
         [
 
             InlineKeyboardButton(
-                "✅ Aceptado",
-                callback_data=f"aceptado_{viaje_id}"
+                "🚖 Iniciar viaje",
+                callback_data=f"iniciar_{viaje_id}"
             ),
 
             InlineKeyboardButton(
-                "❌ Rechazado",
-                callback_data=f"rechazado_{viaje_id}"
+                "🚫 Cancelado",
+                callback_data=f"cancelado_{viaje_id}"
             )
         ]
     ]
@@ -81,17 +82,23 @@ def botones_viaje(viaje_id):
     )
 
 # ==========================================
-# BOTON CANCELAR
+# BOTONES ESTADO INICIADO
 # ==========================================
-def boton_cancelar(viaje_id):
+
+def botones_iniciado(viaje_id):
 
     keyboard = [
 
         [
 
             InlineKeyboardButton(
-                "🚫 Cancelar viaje",
-                callback_data=f"cancelar_{viaje_id}"
+                "✅ Finalizar viaje",
+                callback_data=f"finalizar_{viaje_id}"
+            ),
+
+            InlineKeyboardButton(
+                "🚫 Cancelado",
+                callback_data=f"cancelado_{viaje_id}"
             )
         ]
     ]

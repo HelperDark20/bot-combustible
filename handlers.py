@@ -15,7 +15,8 @@ from telegram.ext import (
 )
 
 from telegram_ui import (
-    menu_principal
+    menu_principal,
+    botones_iniciado
 )
 
 from state import (
@@ -26,7 +27,9 @@ from state import (
 from database import (
     guardar_viaje,
     obtener_viajes,
-    reiniciar_dia
+    reiniciar_dia,
+    actualizar_estado,
+    borrar_dia
 )
 
 from ocr import (
@@ -234,23 +237,65 @@ async def botones_callback(
         )
 
     # =====================================
-    # ACEPTADO
+    # INICIAR VIAJE
     # =====================================
 
-    elif query.data.startswith("aceptado_"):
+    elif query.data.startswith("iniciar_"):
+
+        viaje_id = int(
+            query.data.split("_")[1]
+        )
+
+        actualizar_estado(
+            viaje_id,
+            "iniciado"
+        )
 
         await query.message.reply_text(
-            "✅ Viaje aceptado."
+
+            "🚖 Viaje iniciado.",
+
+            reply_markup=botones_iniciado(
+                viaje_id
+            )
         )
 
     # =====================================
-    # RECHAZADO
+    # FINALIZAR VIAJE
     # =====================================
 
-    elif query.data.startswith("rechazado_"):
+    elif query.data.startswith("finalizar_"):
+
+        viaje_id = int(
+            query.data.split("_")[1]
+        )
+
+        actualizar_estado(
+            viaje_id,
+            "completado"
+        )
 
         await query.message.reply_text(
-            "❌ Viaje rechazado."
+            "✅ Viaje finalizado."
+        )
+
+    # =====================================
+    # CANCELADO
+    # =====================================
+
+    elif query.data.startswith("cancelado_"):
+
+        viaje_id = int(
+            query.data.split("_")[1]
+        )
+
+        actualizar_estado(
+            viaje_id,
+            "cancelado"
+        )
+
+        await query.message.reply_text(
+            "🚫 Viaje cancelado."
         )
 
 # =========================================
@@ -426,3 +471,38 @@ async def recibir_imagen(
         texto,
         reply_markup=keyboard
     )
+
+# =========================================
+# BORRAR FECHA
+# =========================================
+
+async def borrar_fecha(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    try:
+
+        fecha = context.args[0]
+
+        dia, mes, anio = fecha.split("/")
+
+        fecha_sql = (
+            f"{anio}-{mes}-{dia}"
+        )
+
+        borrar_dia(fecha_sql)
+
+        await update.message.reply_text(
+
+            f"🗑 Estadísticas borradas:\n{fecha}"
+
+        )
+
+    except:
+
+        await update.message.reply_text(
+
+            "❌ Usa:\n/borrar 09/05/2026"
+
+        )
