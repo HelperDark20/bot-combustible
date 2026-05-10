@@ -23,7 +23,8 @@ from telegram.ext import (
 from telegram_ui import (
     menu_principal,
     menu_historial,
-    menu_configuracion
+    menu_configuracion,
+    teclado_persistente
 )
 
 from state import (
@@ -65,6 +66,14 @@ async def start(
         "Selecciona una opción:",
 
         menu_principal()
+
+    )
+
+    await update.message.reply_text(
+
+        "🚖 Panel iniciado.",
+
+        reply_markup=teclado_persistente()
 
     )
 
