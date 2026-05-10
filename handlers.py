@@ -24,7 +24,8 @@ from telegram_ui import (
     menu_principal,
     menu_historial,
     menu_configuracion,
-    teclado_persistente
+    teclado_persistente,
+    menu_volver
 )
 
 from state import (
@@ -335,7 +336,8 @@ async def botones_callback(
         texto = obtener_estadisticas()
 
         actualizar_panel_auxiliar(
-            texto
+            texto,
+            menu_volver()
         )
 
     # =====================================
@@ -351,7 +353,6 @@ async def botones_callback(
         actualizar_panel_auxiliar(
 
             texto,
-
             keyboard
 
         )
@@ -407,7 +408,8 @@ async def botones_callback(
         texto = obtener_estadisticas_hoy()
 
         actualizar_panel_auxiliar(
-            texto
+            texto,
+            menu_volver()
         )
 
     # =====================================
@@ -419,7 +421,8 @@ async def botones_callback(
         texto = obtener_estadisticas_semana()
 
         actualizar_panel_auxiliar(
-            texto
+            texto,
+            menu_volver()
         )
 
     # =====================================
@@ -431,7 +434,8 @@ async def botones_callback(
         texto = obtener_estadisticas_mes()
 
         actualizar_panel_auxiliar(
-            texto
+            texto,
+            menu_volver()
         )
 
     # =====================================
@@ -443,7 +447,8 @@ async def botones_callback(
         texto = obtener_estadisticas()
 
         actualizar_panel_auxiliar(
-            texto
+            texto,
+            menu_volver()
         )
 
     # =====================================
@@ -459,7 +464,8 @@ async def botones_callback(
         actualizar_panel_auxiliar(
 
             "📅 Ingresa la fecha a borrar:\n\n"
-            "DD/MM/AAAA"
+            "DD/MM/AAAA",
+            menu_volver()
 
         )
 
@@ -566,6 +572,14 @@ async def recibir_texto(
 
     user_id = update.message.from_user.id
 
+    try:
+
+        await update.message.delete()
+
+    except:
+
+        pass
+
     if update.message.text == "🚀 Iniciar Consulta":
 
         actualizar_panel_auxiliar(
@@ -578,14 +592,6 @@ async def recibir_texto(
         )
 
         return
-
-    try:
-
-        await update.message.delete()
-
-    except:
-
-        pass
 
     # =====================================
     # BORRAR FECHA
@@ -611,7 +617,8 @@ async def recibir_texto(
 
             actualizar_panel_auxiliar(
 
-                f"🗑 Día borrado:\n{fecha}"
+                f"🗑 Día borrado:\n{fecha}",
+                menu_volver()
 
             )
 
@@ -619,7 +626,8 @@ async def recibir_texto(
 
             actualizar_panel_auxiliar(
 
-                "❌ Usa formato:\nDD/MM/AAAA"
+                "❌ Usa formato:\nDD/MM/AAAA",
+                menu_volver()
 
             )
 

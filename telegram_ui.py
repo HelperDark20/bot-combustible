@@ -230,3 +230,26 @@ def teclado_persistente():
         is_persistent=True
 
     )
+
+# ==========================================
+# BOTÓN VOLVER
+# ==========================================
+
+def menu_volver():
+
+    keyboard = [
+
+        [
+
+            InlineKeyboardButton(
+                "⬅️ Volver",
+                callback_data="volver_menu"
+            )
+
+        ]
+
+    ]
+
+    return InlineKeyboardMarkup(
+        keyboard
+    )
