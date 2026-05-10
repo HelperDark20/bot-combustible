@@ -122,3 +122,7 @@ def render_operativo():
             )
 
         ])
+    
+    return texto, InlineKeyboardMarkup(
+        keyboard
+    )
