@@ -27,25 +27,28 @@ def actualizar_panel_auxiliar(
 
     if state.message_id_auxiliar:
 
+        json_data = {
+
+            "chat_id": CHAT_ID,
+
+            "message_id":
+                state.message_id_auxiliar,
+
+            "text": texto
+
+        }
+
+        if reply_markup:
+
+            json_data[
+                "reply_markup"
+            ] = reply_markup.to_dict()
+
         response = requests.post(
 
             f"https://api.telegram.org/bot{TOKEN}/editMessageText",
 
-            json={
-
-                "chat_id": CHAT_ID,
-
-                "message_id":
-                    state.message_id_auxiliar,
-
-                "text": texto,
-
-                "reply_markup":
-                    reply_markup.to_dict()
-                    if reply_markup
-                    else None
-
-            }
+            json=json_data
 
         )
 
@@ -70,29 +73,24 @@ def actualizar_panel_auxiliar(
 
     else:
 
+        json_data = {
+
+            "chat_id": CHAT_ID,
+
+            "text": texto
+
+        }
+
+        if reply_markup:
+
+            json_data[
+                "reply_markup"
+            ] = reply_markup.to_dict()
+
         response = requests.post(
 
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
 
-            json={
-
-                "chat_id": CHAT_ID,
-
-                "text": texto,
-
-                "reply_markup":
-                    reply_markup.to_dict()
-                    if reply_markup
-                    else None
-
-            }
-
-        )
-
-        resultado = response.json()
-
-        state.message_id_auxiliar = (
-
-            resultado["result"]["message_id"]
+            json=json_data
 
         )
