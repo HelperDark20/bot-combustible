@@ -59,10 +59,13 @@ async def start(
     context: ContextTypes.DEFAULT_TYPE
 ):
 
-    await update.message.reply_text(
+    actualizar_panel_auxiliar(
+
         "🚖 BOT IA VIAJES\n\n"
         "Selecciona una opción:",
-        reply_markup=menu_principal()
+
+        menu_principal()
+
     )
 
 # =========================================
@@ -442,7 +445,7 @@ async def botones_callback(
             query.from_user.id
         )
 
-        await query.message.reply_text(
+        actualizar_panel_auxiliar(
 
             "📅 Ingresa la fecha a borrar:\n\n"
             "DD/MM/AAAA"
@@ -552,6 +555,14 @@ async def recibir_texto(
 
     user_id = update.message.from_user.id
 
+    try:
+
+        await update.message.delete()
+
+    except:
+
+        pass
+
     # =====================================
     # BORRAR FECHA
     # =====================================
@@ -574,7 +585,7 @@ async def recibir_texto(
                 user_id
             )
 
-            await update.message.reply_text(
+            actualizar_panel_auxiliar(
 
                 f"🗑 Día borrado:\n{fecha}"
 
@@ -582,7 +593,7 @@ async def recibir_texto(
 
         except:
 
-            await update.message.reply_text(
+            actualizar_panel_auxiliar(
 
                 "❌ Usa formato:\nDD/MM/AAAA"
 
@@ -603,7 +614,7 @@ async def recibir_texto(
 
     except:
 
-        await update.message.reply_text(
+        actualizar_panel_auxiliar(
             "❌ Envía solo números."
         )
 
