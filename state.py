@@ -2,6 +2,8 @@ usuarios_configurando = {}
 
 usuarios_borrando_fecha = set()
 
+message_id_auxiliar = None
+
 # ==========================================
 # PANEL OPERATIVO
 # ==========================================

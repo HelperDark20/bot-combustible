@@ -8,6 +8,10 @@ from ui_operativa import (
     render_operativo
 )
 
+from ui_auxiliar import (
+    actualizar_panel_auxiliar
+)
+
 from telegram import (
     Update
 )
@@ -316,7 +320,7 @@ async def botones_callback(
 
         texto = obtener_estadisticas()
 
-        await query.message.reply_text(
+        actualizar_panel_auxiliar(
             texto
         )
 
@@ -330,11 +334,11 @@ async def botones_callback(
 
         texto = obtener_resumen_combustible()
 
-        await query.message.reply_text(
+        actualizar_panel_auxiliar(
 
             texto,
 
-            reply_markup=keyboard
+            keyboard
 
         )
 
@@ -348,7 +352,7 @@ async def botones_callback(
             query.from_user.id
         ] = "km_l"
 
-        await query.message.reply_text(
+        actualizar_panel_auxiliar(
             "⛽ Envía nuevo KM/L"
         )
 
@@ -362,7 +366,7 @@ async def botones_callback(
             query.from_user.id
         ] = "valor_galon"
 
-        await query.message.reply_text(
+        actualizar_panel_auxiliar(
             "💰 Envía nuevo valor galón"
         )
 
@@ -376,7 +380,7 @@ async def botones_callback(
             query.from_user.id
         ] = "tanque"
 
-        await query.message.reply_text(
+        actualizar_panel_auxiliar(
             "🛢 Envía nuevo valor tanque"
         )
 
@@ -388,7 +392,7 @@ async def botones_callback(
 
         texto = obtener_estadisticas_hoy()
 
-        await query.message.reply_text(
+        actualizar_panel_auxiliar(
             texto
         )
 
@@ -400,7 +404,7 @@ async def botones_callback(
 
         texto = obtener_estadisticas_semana()
 
-        await query.message.reply_text(
+        actualizar_panel_auxiliar(
             texto
         )
 
@@ -412,7 +416,7 @@ async def botones_callback(
 
         texto = obtener_estadisticas_mes()
 
-        await query.message.reply_text(
+        actualizar_panel_auxiliar(
             texto
         )
 
@@ -424,7 +428,7 @@ async def botones_callback(
 
         texto = obtener_estadisticas()
 
-        await query.message.reply_text(
+        actualizar_panel_auxiliar(
             texto
         )
 
@@ -451,12 +455,12 @@ async def botones_callback(
 
     elif query.data == "historial":
 
-        await query.message.reply_text(
+        actualizar_panel_auxiliar(
 
             "📅 HISTORIAL\n\n"
             "Selecciona una opción:",
 
-            reply_markup=menu_historial()
+            menu_historial()
 
         )
 
@@ -466,12 +470,12 @@ async def botones_callback(
 
     elif query.data == "volver_menu":
 
-        await query.message.reply_text(
+        actualizar_panel_auxiliar(
 
             "🚖 BOT IA VIAJES\n\n"
             "Selecciona una opción:",
 
-            reply_markup=menu_principal()
+            menu_principal()
 
         )
 
@@ -614,10 +618,12 @@ async def recibir_texto(
 
     texto = obtener_resumen_combustible()
 
-    await update.message.reply_text(
+    actualizar_panel_auxiliar(
 
         "✅ Configuración actualizada.\n"
-        + texto
+        + texto,
+
+        menu_configuracion()
 
     )
 
