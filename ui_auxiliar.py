@@ -54,6 +54,12 @@ def actualizar_panel_auxiliar(
 
         resultado = response.json()
 
+        state.message_id_auxiliar = (
+
+            resultado["result"]["message_id"]
+
+        )
+
         print(resultado)
 
         # ==================================
