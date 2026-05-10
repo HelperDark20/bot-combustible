@@ -128,7 +128,7 @@ def upload():
 
         nuevo_viaje = {
 
-            "ganancia": data["dinero"],
+            "ganancia": float(data["dinero"]),
 
             "distancia_total":
                 resultado_score["distancia_total"],
