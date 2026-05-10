@@ -316,7 +316,7 @@ async def botones_callback(
     # ESTADÍSTICAS
     # =====================================
 
-    if query.data == "stats":
+    elif query.data == "stats":
 
         texto = obtener_estadisticas()
 
