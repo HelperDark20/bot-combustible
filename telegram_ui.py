@@ -227,6 +227,6 @@ def teclado_persistente():
 
         resize_keyboard=True,
 
-        persistent=True
+        is_persistent=True
 
     )

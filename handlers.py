@@ -69,9 +69,11 @@ async def start(
 
     )
 
-    await update.message.reply_text(
+    await context.bot.send_message(
 
-        "🚖 Panel iniciado.",
+        chat_id=update.effective_chat.id,
+
+        text="🚖 Panel iniciado.",
 
         reply_markup=teclado_persistente()
 
