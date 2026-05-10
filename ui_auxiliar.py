@@ -54,12 +54,6 @@ def actualizar_panel_auxiliar(
 
         resultado = response.json()
 
-        state.message_id_auxiliar = (
-
-            resultado["result"]["message_id"]
-
-        )
-
         print(resultado)
 
         # ==================================
@@ -100,5 +94,15 @@ def actualizar_panel_auxiliar(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
 
             json=json_data
+
+        )
+
+        resultado = response.json()
+
+        print("SEND:", resultado)
+
+        state.message_id_auxiliar = (
+
+            resultado["result"]["message_id"]
 
         )
