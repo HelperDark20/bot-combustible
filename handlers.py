@@ -126,7 +126,7 @@ async def botones_callback(
         if state.viaje_pendiente:
 
             state.viaje_en_curso = (
-                state.viaje_pendiente
+                state.viaje_pendiente.copy()
             )
 
             state.viaje_pendiente = None
@@ -172,7 +172,7 @@ async def botones_callback(
         if state.viaje_pendiente:
 
             state.viaje_en_curso = (
-                state.viaje_pendiente
+                state.viaje_pendiente.copy()
             )
 
             state.viaje_pendiente = None
@@ -226,7 +226,7 @@ async def botones_callback(
             if state.viaje_pendiente:
 
                 state.viaje_en_curso = (
-                    state.viaje_pendiente
+                    state.viaje_pendiente.copy()
                 )
 
                 state.viaje_pendiente = None

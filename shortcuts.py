@@ -149,7 +149,8 @@ def upload():
                 resultado_score["estado_score"],
 
             "estado_operativo":
-                "pendiente"
+                "curso" if not state.viaje_en_curso
+                else "pendiente"
 
         }
 
