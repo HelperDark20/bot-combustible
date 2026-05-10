@@ -235,8 +235,8 @@ def upload():
         })
 
     except Exception as e:
-
-        print(e)
+        import traceback
+        traceback.print_exc()
 
         return jsonify({
             "error": str(e)
