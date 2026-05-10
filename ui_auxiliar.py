@@ -54,6 +54,8 @@ def actualizar_panel_auxiliar(
 
         resultado = response.json()
 
+        print(resultado)
+
         # ==================================
         # SI FALLA → CREAR NUEVO
         # ==================================
