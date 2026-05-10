@@ -564,6 +564,19 @@ async def recibir_texto(
 
     user_id = update.message.from_user.id
 
+    if update.message.text == "🚀 Iniciar Consulta":
+
+        actualizar_panel_auxiliar(
+
+            "🚖 BOT IA VIAJES\n\n"
+            "Selecciona una opción:",
+
+            menu_principal()
+
+        )
+
+        return
+
     try:
 
         await update.message.delete()
