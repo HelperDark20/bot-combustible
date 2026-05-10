@@ -127,6 +127,8 @@ def upload():
         # ==================================
 
         nuevo_viaje = {
+            
+            "id": viaje_id,
 
             "ganancia": float(data["dinero"]),
 

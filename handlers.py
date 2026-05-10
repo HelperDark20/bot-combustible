@@ -28,6 +28,7 @@ from state import (
 )
 
 from database import (
+    actualizar_estado,
     borrar_dia
 )
 
@@ -137,6 +138,14 @@ async def botones_callback(
 
         if state.viaje_en_curso:
 
+            actualizar_estado(
+
+                state.viaje_en_curso["id"],
+
+                "iniciado"
+
+            )
+
             state.viaje_en_curso[
                 "estado_operativo"
             ] = "curso"
@@ -168,6 +177,16 @@ async def botones_callback(
         # ==================================
         # SI HAY PENDIENTE
         # ==================================
+
+        if state.viaje_en_curso:
+
+            actualizar_estado(
+
+                state.viaje_en_curso["id"],
+
+                "completado"
+
+            )
 
         if state.viaje_pendiente:
 
@@ -221,6 +240,18 @@ async def botones_callback(
 
         if state.vista_actual == "curso":
 
+
+            if state.viaje_en_curso:
+
+                actualizar_estado(
+
+                    state.viaje_en_curso["id"],
+
+                    "cancelado"
+
+                )
+
+
             # si hay pendiente → pasa a curso
 
             if state.viaje_pendiente:
@@ -246,6 +277,16 @@ async def botones_callback(
         # ==================================
 
         elif state.vista_actual == "pendiente":
+
+            if state.viaje_pendiente:
+
+                actualizar_estado(
+
+                    state.viaje_pendiente["id"],
+
+                    "cancelado"
+
+                )
 
             state.viaje_pendiente = None
 
