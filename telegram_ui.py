@@ -4,8 +4,8 @@
 from telegram import (
 
     InlineKeyboardButton,
-
-    InlineKeyboardMarkup
+    InlineKeyboardMarkup,
+    ReplyKeyboardMarkup
 )
 
 # ==========================================
@@ -207,4 +207,26 @@ def botones_iniciado(viaje_id):
 
     return InlineKeyboardMarkup(
         keyboard
+    )
+
+# =========================================
+# BOTÓN PERSISTENTE
+# =========================================
+
+def teclado_persistente():
+
+    keyboard = [
+
+        ["🚀 Iniciar Consulta"]
+
+    ]
+
+    return ReplyKeyboardMarkup(
+
+        keyboard,
+
+        resize_keyboard=True,
+
+        persistent=True
+
     )
