@@ -40,6 +40,9 @@ def optimizar_imagen(ruta_original):
 
     ruta_final = "optimized.jpg"
 
+    if crop.mode in ("RGBA", "P"):
+        crop = crop.convert("RGB")
+
     crop.save(
 
         ruta_final,
