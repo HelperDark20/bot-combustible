@@ -1,5 +1,6 @@
 from flask import jsonify
 import state
+from flask import render_template
 
 def registrar_api(app):
 
@@ -18,4 +19,21 @@ def registrar_api(app):
             "vista_actual":
                 state.vista_actual
 
-        })
+        })  
+    @app.route("/overlay")
+
+    def overlay():
+
+        viaje = state.viaje_pendiente or state.viaje_en_curso
+
+        if not viaje:
+
+            return "No hay viaje"
+
+        return render_template(
+
+            "overlay.html",
+
+            viaje=viaje
+
+        )
