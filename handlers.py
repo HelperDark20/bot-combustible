@@ -4,6 +4,10 @@
 
 import state
 
+ULTIMO_RENDER = 0
+
+import time
+
 from ui_operativa import (
     render_operativo
 )
@@ -105,6 +109,24 @@ async def safe_edit_message(
         )
 
 # =========================================
+# RENDER
+# =========================================
+
+def puede_renderizar():
+
+    global ULTIMO_RENDER
+
+    ahora = time.time()
+
+    # 0.8 segundos cooldown
+    if ahora - ULTIMO_RENDER < 0.8:
+        return False
+
+    ULTIMO_RENDER = ahora
+
+    return True
+
+# =========================================
 # START
 # =========================================
 
@@ -153,6 +175,9 @@ async def botones_callback(
 
         state.vista_actual = "curso"
 
+        if not puede_renderizar():
+            return
+
         texto, reply_markup = (
             render_operativo()
         )
@@ -170,6 +195,9 @@ async def botones_callback(
     elif query.data == "ver_pendiente":
 
         state.vista_actual = "pendiente"
+
+        if not puede_renderizar():
+            return
 
         texto, reply_markup = (
             render_operativo()
@@ -222,6 +250,9 @@ async def botones_callback(
         # ==================================
         # RERENDER
         # ==================================
+
+        if not puede_renderizar():
+            return
 
         texto, reply_markup = (
             render_operativo()
@@ -280,6 +311,9 @@ async def botones_callback(
         # ==================================
         # RERENDER
         # ==================================
+
+        if not puede_renderizar():
+            return
 
         texto, reply_markup = (
             render_operativo()
@@ -358,6 +392,9 @@ async def botones_callback(
         # ==================================
         # RERENDER
         # ==================================
+
+        if not puede_renderizar():
+            return
 
         texto, reply_markup = (
             render_operativo()
@@ -618,9 +655,11 @@ async def recibir_texto(
 
         await update.message.delete()
 
-    except:
+    except Exception as e:
 
-        pass
+        print(
+            f"🔥 ERROR: {e}"
+        )
 
     if update.message.text == "🚀 Iniciar Consulta":
 
@@ -664,8 +703,12 @@ async def recibir_texto(
 
             )
 
-        except:
+        except Exception as e:
 
+            print(
+                f"🔥 ERROR: {e}"
+            )
+            
             actualizar_panel_auxiliar(
 
                 "❌ Usa formato:\nDD/MM/AAAA",
@@ -686,7 +729,11 @@ async def recibir_texto(
             update.message.text
         )
 
-    except:
+    except Exception as e:
+
+        print(
+            f"🔥 ERROR: {e}"
+        )
 
         actualizar_panel_auxiliar(
             "❌ Envía solo números."
