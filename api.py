@@ -41,11 +41,6 @@ def registrar_api(app):
 
         viaje = viaje_original.copy()
 
-
-        if not viaje:
-
-            return "No hay viaje"
-
         pickup = viaje.get(
             "distancia_recogida_km",
             0
@@ -127,40 +122,6 @@ def registrar_api(app):
         viaje["ganancia"] = format(
 
             round(ganancia),
-
-            ","
-
-        ).replace(",", ".")
-
-        dinero_por_km = float(
-
-            viaje.get(
-                "dinero_por_km",
-                0
-            ) or 0
-
-        )
-
-        viaje["dinero_por_km"] = format(
-
-            round(dinero_por_km),
-
-            ","
-
-        ).replace(",", ".")
-
-        dinero_por_min = float(
-
-            viaje.get(
-                "dinero_por_min",
-                0
-            ) or 0
-
-        )
-
-        viaje["dinero_por_min"] = format(
-
-            round(dinero_por_min),
 
             ","
 
