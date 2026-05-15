@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>Dashboard</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+
+        * {
+
+            margin: 0;
+
+            padding: 0;
+
+            box-sizing: border-box;
+
+        }
+
+        body {
+
+            background: #070707;
+
+            color: white;
+
+            font-family: 'Inter', sans-serif;
+
+            padding: 30px;
+
+        }
+
+        .title {
+
+            font-size: 34px;
+
+            font-weight: 800;
+
+            margin-bottom: 30px;
+
+        }
+
+        .section {
+
+            margin-bottom: 30px;
+
+        }
+
+        .section-title {
+
+            font-size: 18px;
+
+            opacity: 0.8;
+
+            margin-bottom: 16px;
+
+        }
+
+        .card {
+
+            background: rgba(255,255,255,0.03);
+
+            border: 1px solid rgba(255,255,255,0.05);
+
+            border-radius: 24px;
+
+            padding: 24px;
+
+            backdrop-filter: blur(18px);
+
+            box-shadow:
+
+                0 10px 35px rgba(0,0,0,0.55);
+
+        }
+
+        .money {
+
+            font-size: 40px;
+
+            font-weight: 800;
+
+            color: #00f7a5;
+
+            margin-bottom: 16px;
+
+        }
+
+        .stats {
+
+            display: flex;
+
+            gap: 18px;
+
+            margin-bottom: 20px;
+
+            opacity: 0.9;
+
+        }
+
+        .buttons {
+
+            display: flex;
+
+            gap: 12px;
+
+            margin-top: 20px;
+
+        }
+
+        .btn {
+
+            border: none;
+
+            border-radius: 14px;
+
+            padding: 14px 20px;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+        }
+
+        .btn:hover {
+
+            transform: scale(1.03);
+
+        }
+
+        .finish {
+
+            background: #00f7a5;
+
+            color: black;
+
+        }
+
+        .cancel {
+
+            background: rgba(255,255,255,0.08);
+
+            color: white;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="title">
+
+        🚗 Operaciones en tiempo real
+
+    </div>
+
+    {% if viaje_en_curso %}
+
+    <div class="section">
+
+        <div class="section-title">
+
+            VIAJE EN CURSO
+
+        </div>
+
+        <div class="card">
+
+            <div class="money">
+
+                ${{ viaje_en_curso.ganancia }}
+
+            </div>
+
+            <div class="stats">
+
+                <div>
+
+                    📍 {{ viaje_en_curso.distancia_total }} km
+
+                </div>
+
+                <div>
+
+                    ⏱ {{ viaje_en_curso.tiempo_total }} min
+
+                </div>
+
+                <div>
+
+                    ⭐ {{ viaje_en_curso.score_visual }}/10
+
+                </div>
+
+            </div>
+
+            <div>
+
+                {{ viaje_en_curso.estado_score }}
+
+            </div>
+
+            <div class="buttons">
+
+                <button class="btn finish">
+
+                    FINALIZAR
+
+                </button>
+
+                <button class="btn cancel">
+
+                    CANCELAR
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    {% if viaje_pendiente %}
+
+    <div class="section">
+
+        <div class="section-title">
+
+            VIAJE PENDIENTE
+
+        </div>
+
+        <div class="card">
+
+            <div class="money">
+
+                ${{ viaje_pendiente.ganancia }}
+
+            </div>
+
+            <div class="stats">
+
+                <div>
+
+                    📍 {{ viaje_pendiente.distancia_total }} km
+
+                </div>
+
+                <div>
+
+                    ⏱ {{ viaje_pendiente.tiempo_total }} min
+
+                </div>
+
+                <div>
+
+                    ⭐ {{ viaje_pendiente.score_visual }}/10
+
+                </div>
+
+            </div>
+
+            <div>
+
+                {{ viaje_pendiente.estado_score }}
+
+            </div>
+
+            <div class="buttons">
+
+                <button class="btn cancel">
+
+                    CANCELAR
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</body>
+
+</html>

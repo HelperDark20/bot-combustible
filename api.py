@@ -22,6 +22,21 @@ def registrar_api(app):
         })  
     @app.route("/overlay")
 
+
+    @app.route("/")
+
+    def dashboard():
+
+        return render_template(
+
+            "dashboard.html",
+
+            viaje_en_curso=state.viaje_en_curso,
+
+            viaje_pendiente=state.viaje_pendiente
+
+        )
+
     def overlay():
 
 
