@@ -175,12 +175,10 @@ async def botones_callback(
             render_operativo()
         )
 
-        await query.edit_message_text(
-
-            text=texto,
-
-            reply_markup=reply_markup
-
+        await safe_edit_message(
+            query,
+            texto,
+            reply_markup
         )
 
     # ======================================
@@ -229,12 +227,10 @@ async def botones_callback(
             render_operativo()
         )
 
-        await query.edit_message_text(
-
-            text=texto,
-
-            reply_markup=reply_markup
-
+        await safe_edit_message(
+            query,
+            texto,
+            reply_markup
         )
 
     # ======================================
@@ -289,12 +285,10 @@ async def botones_callback(
             render_operativo()
         )
 
-        await query.edit_message_text(
-
-            text=texto,
-
-            reply_markup=reply_markup
-
+        await safe_edit_message(
+            query,
+            texto,
+            reply_markup
         )
 
     # ======================================
@@ -369,12 +363,10 @@ async def botones_callback(
             render_operativo()
         )
 
-        await query.edit_message_text(
-
-            text=texto,
-
-            reply_markup=reply_markup
-
+        await safe_edit_message(
+            query,
+            texto,
+            reply_markup
         )
 
     # =====================================
