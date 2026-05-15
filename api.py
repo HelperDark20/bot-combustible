@@ -131,7 +131,9 @@ def registrar_api(app):
 
                 viaje["porcentaje_usuario"] = int(
 
-                    (pickup / total) * 100
+                    100 -
+
+                    ((pickup / total) * 100)
 
                 )
 
