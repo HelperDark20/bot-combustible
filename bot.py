@@ -2,7 +2,7 @@
 # IMPORTS
 # ==========================================
 import threading
-
+import traceback
 from telegram.ext import (
 
     Application,
@@ -74,6 +74,24 @@ telegram_app.add_handler(
 )
 
 # ==========================================
+# TRACEBACK
+# ==========================================
+
+async def error_handler(update, context):
+
+    print("🔥 ERROR GLOBAL 🔥")
+
+    traceback.print_exception(
+        None,
+        context.error,
+        context.error.__traceback__
+    )
+
+telegram_app.add_error_handler(
+    error_handler
+)
+
+# ==========================================
 # FLASK THREAD
 # ==========================================
 def run_flask():
@@ -93,7 +111,8 @@ def run_flask():
 if __name__ == "__main__":
 
     flask_thread = threading.Thread(
-        target=run_flask
+        target=run_flask,
+        daemon=True
     )
 
     flask_thread.start()

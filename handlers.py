@@ -16,6 +16,10 @@ from telegram import (
     Update
 )
 
+from telegram.error import (
+    BadRequest
+)
+
 from telegram.ext import (
     ContextTypes
 )
@@ -51,6 +55,54 @@ from fuel import (
 
     guardar_config
 )
+
+# =========================================
+# SAFE TELEGRAM EDIT
+# =========================================
+
+async def safe_edit_message(
+    query,
+    texto,
+    reply_markup
+):
+
+    try:
+
+        await query.edit_message_text(
+
+            text=texto,
+
+            reply_markup=reply_markup
+
+        )
+
+    except BadRequest as e:
+
+        error_text = str(e)
+
+        print(
+            f"⚠️ TELEGRAM EDIT: {error_text}"
+        )
+
+        # mensaje igual
+        if (
+            "Message is not modified"
+            in error_text
+        ):
+            return
+
+        # mensaje perdido
+        elif (
+            "message to edit not found"
+            in error_text
+        ):
+            return
+
+    except Exception as e:
+
+        print(
+            f"🔥 ERROR EDIT MESSAGE: {e}"
+        )
 
 # =========================================
 # START
@@ -104,13 +156,11 @@ async def botones_callback(
         texto, reply_markup = (
             render_operativo()
         )
-
-        await query.edit_message_text(
-
-            text=texto,
-
-            reply_markup=reply_markup
-
+    
+        await safe_edit_message(
+            query,
+            texto,
+            reply_markup
         )
 
     # ======================================
