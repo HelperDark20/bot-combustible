@@ -40,8 +40,11 @@ def calcular_score(data):
                 2
             )
 
-    except:
-        pass
+    except Exception as e:
+
+        print(
+            f"🔥 SCORE ERROR: {e}"
+        )
 
     # ======================================
     # DINERO POR MIN
@@ -60,8 +63,11 @@ def calcular_score(data):
                 2
             )
 
-    except:
-        pass
+    except Exception as e:
+
+        print(
+            f"🔥 SCORE ERROR: {e}"
+        )
 
     # ======================================
     # SCORE VISUAL

@@ -2,7 +2,7 @@
 # IMPORTS
 # ==========================================
 import sqlite3
-
+import state
 from datetime import datetime
 
 import pytz
@@ -76,72 +76,74 @@ conn.commit()
 # ==========================================
 def guardar_viaje(data):
 
-    (
-        distancia_total,
-        tiempo_total,
-        dinero_por_km,
-        dinero_por_min,
-        score_visual,
-        estado_score
-    ) = calcular_score(data)
+    with state.STATE_LOCK:
 
-    fecha = datetime.now(
-        zona_colombia
-    ).strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
+        (
+            distancia_total,
+            tiempo_total,
+            dinero_por_km,
+            dinero_por_min,
+            score_visual,
+            estado_score
+        ) = calcular_score(data)
 
-    cursor.execute("""
+        fecha = datetime.now(
+            zona_colombia
+        ).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
 
-    INSERT INTO viajes (
+        cursor.execute("""
 
-        fecha,
-        tipo_viaje,
-        dinero,
-        distancia_recogida,
-        distancia_destino,
-        tiempo_recogida,
-        tiempo_destino,
-        distancia_total,
-        tiempo_total,
-        score,
-        score_visual,
-        estado
+        INSERT INTO viajes (
 
-    )
+            fecha,
+            tipo_viaje,
+            dinero,
+            distancia_recogida,
+            distancia_destino,
+            tiempo_recogida,
+            tiempo_destino,
+            distancia_total,
+            tiempo_total,
+            score,
+            score_visual,
+            estado
 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        )
 
-    """, (
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 
-        fecha,
+        """, (
 
-        data["tipo_viaje"],
+            fecha,
 
-        data["dinero"],
+            data["tipo_viaje"],
 
-        data["distancia_recogida_km"],
+            data["dinero"],
 
-        data["distancia_destino_km"],
+            data["distancia_recogida_km"],
 
-        data["tiempo_recogida_min"],
+            data["distancia_destino_km"],
 
-        data["tiempo_destino_min"],
+            data["tiempo_recogida_min"],
 
-        distancia_total,
+            data["tiempo_destino_min"],
 
-        tiempo_total,
+            distancia_total,
 
-        dinero_por_km,
+            tiempo_total,
 
-        score_visual,
+            dinero_por_km,
 
-        "pendiente"
-    ))
+            score_visual,
 
-    conn.commit()
+            "pendiente"
+        ))
 
-    return cursor.lastrowid
+        conn.commit()
+
+        return cursor.lastrowid
 
 # ==========================================
 # BORRAR DÍA ESPECÍFICO
@@ -149,15 +151,17 @@ def guardar_viaje(data):
 
 def borrar_dia(fecha):
 
-    cursor.execute("""
+    with state.STATE_LOCK:
 
-    DELETE FROM viajes
+        cursor.execute("""
 
-    WHERE DATE(fecha) = ?
+        DELETE FROM viajes
 
-    """, (fecha,))
+        WHERE DATE(fecha) = ?
 
-    conn.commit()
+        """, (fecha,))
+
+        conn.commit()
 
 # ==========================================
 # ACTUALIZAR ESTADO
@@ -165,79 +169,81 @@ def borrar_dia(fecha):
 
 def actualizar_estado(viaje_id, estado):
 
-    ahora = datetime.now(
-        zona_colombia
-    ).strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
+    with state.STATE_LOCK:
 
-    # ======================================
-    # INICIADO
-    # ======================================
+        ahora = datetime.now(
+            zona_colombia
+        ).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
 
-    if estado == "iniciado":
+        # ======================================
+        # INICIADO
+        # ======================================
 
-        cursor.execute("""
+        if estado == "iniciado":
 
-        UPDATE viajes
+            cursor.execute("""
 
-        SET
-            estado = ?,
-            hora_inicio = ?
+            UPDATE viajes
 
-        WHERE id = ?
+            SET
+                estado = ?,
+                hora_inicio = ?
 
-        """, (
+            WHERE id = ?
 
-            estado,
-            ahora,
-            viaje_id
+            """, (
 
-        ))
+                estado,
+                ahora,
+                viaje_id
 
-    # ======================================
-    # COMPLETADO
-    # ======================================
+            ))
 
-    elif estado == "completado":
+        # ======================================
+        # COMPLETADO
+        # ======================================
 
-        cursor.execute("""
+        elif estado == "completado":
 
-        UPDATE viajes
+            cursor.execute("""
 
-        SET
-            estado = ?,
-            hora_fin = ?
+            UPDATE viajes
 
-        WHERE id = ?
+            SET
+                estado = ?,
+                hora_fin = ?
 
-        """, (
+            WHERE id = ?
 
-            estado,
-            ahora,
-            viaje_id
+            """, (
 
-        ))
+                estado,
+                ahora,
+                viaje_id
 
-    # ======================================
-    # CANCELADO
-    # ======================================
+            ))
 
-    else:
+        # ======================================
+        # CANCELADO
+        # ======================================
 
-        cursor.execute("""
+        else:
 
-        UPDATE viajes
+            cursor.execute("""
 
-        SET estado = ?
+            UPDATE viajes
 
-        WHERE id = ?
+            SET estado = ?
 
-        """, (
+            WHERE id = ?
 
-            estado,
-            viaje_id
+            """, (
 
-        ))
+                estado,
+                viaje_id
 
-    conn.commit()
+            ))
+
+        conn.commit()

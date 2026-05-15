@@ -48,13 +48,17 @@ def actualizar_panel_auxiliar(
 
             f"https://api.telegram.org/bot{TOKEN}/editMessageText",
 
-            json=json_data
+            json=json_data,
+
+            timeout=10
 
         )
 
         resultado = response.json()
 
-        print(resultado)
+        print(
+            f"📨 AUXILIAR EDIT: {resultado}"
+        )
 
         # ==================================
         # SI FALLA → CREAR NUEVO
@@ -62,12 +66,13 @@ def actualizar_panel_auxiliar(
 
         if not resultado.get("ok"):
 
+            print(
+                "⚠️ PANEL AUXILIAR RESET"
+            )
+
             state.message_id_auxiliar = None
 
-            actualizar_panel_auxiliar(
-                texto,
-                reply_markup
-            )
+            return
 
     # ======================================
     # CREAR NUEVO
@@ -93,13 +98,17 @@ def actualizar_panel_auxiliar(
 
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
 
-            json=json_data
+            json=json_data,
+
+            timeout=10
 
         )
 
         resultado = response.json()
 
-        print("SEND:", resultado)
+        print(
+            f"📨 AUXILIAR SEND: {resultado}"
+        )
 
         state.message_id_auxiliar = (
 

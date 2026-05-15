@@ -2,7 +2,7 @@
 # IMPORTS
 # ==========================================
 from database import cursor
-
+import state
 from fuel import (
 
     calcular_gasto_combustible_total,
@@ -17,93 +17,95 @@ from fuel import (
 
 def obtener_estadisticas_hoy():
 
-    cursor.execute("""
+    with state.STATE_LOCK:
 
-    SELECT COUNT(*)
+        cursor.execute("""
 
-    FROM viajes
+        SELECT COUNT(*)
 
-    WHERE DATE(fecha) = DATE('now', '-5 hours')
+        FROM viajes
 
-    """)
+        WHERE DATE(fecha) = DATE('now', '-5 hours')
 
-    viajes = cursor.fetchone()[0]
+        """)
 
-    # ======================================
-    # COMPLETADOS
-    # ======================================
+        viajes = cursor.fetchone()[0]
 
-    cursor.execute("""
+        # ======================================
+        # COMPLETADOS
+        # ======================================
 
-    SELECT COUNT(*)
+        cursor.execute("""
 
-    FROM viajes
+        SELECT COUNT(*)
 
-    WHERE estado='completado'
+        FROM viajes
 
-    AND DATE(fecha) = DATE('now', '-5 hours')
+        WHERE estado='completado'
 
-    """)
+        AND DATE(fecha) = DATE('now', '-5 hours')
 
-    completados = cursor.fetchone()[0]
+        """)
 
-    # ======================================
-    # CANCELADOS
-    # ======================================
+        completados = cursor.fetchone()[0]
 
-    cursor.execute("""
+        # ======================================
+        # CANCELADOS
+        # ======================================
 
-    SELECT COUNT(*)
+        cursor.execute("""
 
-    FROM viajes
+        SELECT COUNT(*)
 
-    WHERE estado='cancelado'
+        FROM viajes
 
-    AND DATE(fecha) = DATE('now', '-5 hours')
+        WHERE estado='cancelado'
 
-    """)
+        AND DATE(fecha) = DATE('now', '-5 hours')
 
-    cancelados = cursor.fetchone()[0]
+        """)
 
-    # ======================================
-    # GANANCIA TOTAL
-    # ======================================
+        cancelados = cursor.fetchone()[0]
 
-    cursor.execute("""
+        # ======================================
+        # GANANCIA TOTAL
+        # ======================================
 
-    SELECT SUM(dinero)
+        cursor.execute("""
 
-    FROM viajes
+        SELECT SUM(dinero)
 
-    WHERE estado='completado'
+        FROM viajes
 
-    AND DATE(fecha) = DATE('now', '-5 hours')
+        WHERE estado='completado'
 
-    """)
+        AND DATE(fecha) = DATE('now', '-5 hours')
 
-    ganancia_total = cursor.fetchone()[0]
+        """)
 
-    if ganancia_total is None:
+        ganancia_total = cursor.fetchone()[0]
 
-        ganancia_total = 0
+        if ganancia_total is None:
 
-    return (
+            ganancia_total = 0
 
-        "📆 HISTORIAL HOY\n\n"
+        return (
 
-        f"🚘 Viajes:\n"
-        f"{viajes}\n\n"
+            "📆 HISTORIAL HOY\n\n"
 
-        f"✅ Completados:\n"
-        f"{completados}\n\n"
+            f"🚘 Viajes:\n"
+            f"{viajes}\n\n"
 
-        f"🚫 Cancelados:\n"
-        f"{cancelados}\n\n"
+            f"✅ Completados:\n"
+            f"{completados}\n\n"
 
-        f"💰 Ganancia:\n"
-        f"{ganancia_total:,.0f} COP"
+            f"🚫 Cancelados:\n"
+            f"{cancelados}\n\n"
 
-    )
+            f"💰 Ganancia:\n"
+            f"{ganancia_total:,.0f} COP"
+
+        )
 
 # ==========================================
 # ESTADÍSTICAS SEMANA
@@ -111,101 +113,103 @@ def obtener_estadisticas_hoy():
 
 def obtener_estadisticas_semana():
 
-    cursor.execute("""
+    with state.STATE_LOCK:
 
-    SELECT COUNT(*)
+        cursor.execute("""
 
-    FROM viajes
+        SELECT COUNT(*)
 
-    WHERE strftime('%W', fecha)
-    =
-    strftime('%W', 'now', '-5 hours')
+        FROM viajes
 
-    """)
+        WHERE strftime('%W', fecha)
+        =
+        strftime('%W', 'now', '-5 hours')
 
-    viajes = cursor.fetchone()[0]
+        """)
 
-    # ======================================
-    # COMPLETADOS
-    # ======================================
+        viajes = cursor.fetchone()[0]
 
-    cursor.execute("""
+        # ======================================
+        # COMPLETADOS
+        # ======================================
 
-    SELECT COUNT(*)
+        cursor.execute("""
 
-    FROM viajes
+        SELECT COUNT(*)
 
-    WHERE estado='completado'
+        FROM viajes
 
-    AND strftime('%W', fecha)
-    =
-    strftime('%W', 'now', '-5 hours')
+        WHERE estado='completado'
 
-    """)
+        AND strftime('%W', fecha)
+        =
+        strftime('%W', 'now', '-5 hours')
 
-    completados = cursor.fetchone()[0]
+        """)
 
-    # ======================================
-    # CANCELADOS
-    # ======================================
+        completados = cursor.fetchone()[0]
 
-    cursor.execute("""
+        # ======================================
+        # CANCELADOS
+        # ======================================
 
-    SELECT COUNT(*)
+        cursor.execute("""
 
-    FROM viajes
+        SELECT COUNT(*)
 
-    WHERE estado='cancelado'
+        FROM viajes
 
-    AND strftime('%W', fecha)
-    =
-    strftime('%W', 'now', '-5 hours')
+        WHERE estado='cancelado'
 
-    """)
+        AND strftime('%W', fecha)
+        =
+        strftime('%W', 'now', '-5 hours')
 
-    cancelados = cursor.fetchone()[0]
+        """)
 
-    # ======================================
-    # GANANCIA TOTAL
-    # ======================================
+        cancelados = cursor.fetchone()[0]
 
-    cursor.execute("""
+        # ======================================
+        # GANANCIA TOTAL
+        # ======================================
 
-    SELECT SUM(dinero)
+        cursor.execute("""
 
-    FROM viajes
+        SELECT SUM(dinero)
 
-    WHERE estado='completado'
+        FROM viajes
 
-    AND strftime('%W', fecha)
-    =
-    strftime('%W', 'now', '-5 hours')
+        WHERE estado='completado'
 
-    """)
+        AND strftime('%W', fecha)
+        =
+        strftime('%W', 'now', '-5 hours')
 
-    ganancia_total = cursor.fetchone()[0]
+        """)
 
-    if ganancia_total is None:
+        ganancia_total = cursor.fetchone()[0]
 
-        ganancia_total = 0
+        if ganancia_total is None:
 
-    return (
+            ganancia_total = 0
 
-        "📅 HISTORIAL SEMANA\n\n"
+        return (
 
-        f"🚘 Viajes:\n"
-        f"{viajes}\n\n"
+            "📅 HISTORIAL SEMANA\n\n"
 
-        f"✅ Completados:\n"
-        f"{completados}\n\n"
+            f"🚘 Viajes:\n"
+            f"{viajes}\n\n"
 
-        f"🚫 Cancelados:\n"
-        f"{cancelados}\n\n"
+            f"✅ Completados:\n"
+            f"{completados}\n\n"
 
-        f"💰 Ganancia:\n"
-        f"{ganancia_total:,.0f} COP"
+            f"🚫 Cancelados:\n"
+            f"{cancelados}\n\n"
 
-    )
+            f"💰 Ganancia:\n"
+            f"{ganancia_total:,.0f} COP"
+
+        )
 
 # ==========================================
 # ESTADÍSTICAS MES
@@ -213,218 +217,222 @@ def obtener_estadisticas_semana():
 
 def obtener_estadisticas_mes():
 
-    cursor.execute("""
+    with state.STATE_LOCK:
 
-    SELECT COUNT(*)
+        cursor.execute("""
 
-    FROM viajes
+        SELECT COUNT(*)
 
-    WHERE strftime('%m', fecha)
-    =
-    strftime('%m', 'now', '-5 hours')
+        FROM viajes
 
-    """)
+        WHERE strftime('%m', fecha)
+        =
+        strftime('%m', 'now', '-5 hours')
 
-    viajes = cursor.fetchone()[0]
+        """)
 
-    # ======================================
-    # COMPLETADOS
-    # ======================================
+        viajes = cursor.fetchone()[0]
 
-    cursor.execute("""
+        # ======================================
+        # COMPLETADOS
+        # ======================================
 
-    SELECT COUNT(*)
+        cursor.execute("""
 
-    FROM viajes
+        SELECT COUNT(*)
 
-    WHERE estado='completado'
+        FROM viajes
 
-    AND strftime('%m', fecha)
-    =
-    strftime('%m', 'now', '-5 hours')
+        WHERE estado='completado'
 
-    """)
+        AND strftime('%m', fecha)
+        =
+        strftime('%m', 'now', '-5 hours')
 
-    completados = cursor.fetchone()[0]
+        """)
 
-    # ======================================
-    # CANCELADOS
-    # ======================================
+        completados = cursor.fetchone()[0]
 
-    cursor.execute("""
+        # ======================================
+        # CANCELADOS
+        # ======================================
 
-    SELECT COUNT(*)
+        cursor.execute("""
 
-    FROM viajes
+        SELECT COUNT(*)
 
-    WHERE estado='cancelado'
+        FROM viajes
 
-    AND strftime('%m', fecha)
-    =
-    strftime('%m', 'now', '-5 hours')
+        WHERE estado='cancelado'
 
-    """)
+        AND strftime('%m', fecha)
+        =
+        strftime('%m', 'now', '-5 hours')
 
-    cancelados = cursor.fetchone()[0]
+        """)
 
-    # ======================================
-    # GANANCIA TOTAL
-    # ======================================
+        cancelados = cursor.fetchone()[0]
 
-    cursor.execute("""
+        # ======================================
+        # GANANCIA TOTAL
+        # ======================================
 
-    SELECT SUM(dinero)
+        cursor.execute("""
 
-    FROM viajes
+        SELECT SUM(dinero)
 
-    WHERE estado='completado'
+        FROM viajes
 
-    AND strftime('%m', fecha)
-    =
-    strftime('%m', 'now', '-5 hours')
+        WHERE estado='completado'
 
-    """)
+        AND strftime('%m', fecha)
+        =
+        strftime('%m', 'now', '-5 hours')
 
-    ganancia_total = cursor.fetchone()[0]
+        """)
 
-    if ganancia_total is None:
+        ganancia_total = cursor.fetchone()[0]
 
-        ganancia_total = 0
+        if ganancia_total is None:
 
-    return (
+            ganancia_total = 0
 
-        "🗓 HISTORIAL MES\n\n"
+        return (
 
-        f"🚘 Viajes:\n"
-        f"{viajes}\n\n"
+            "🗓 HISTORIAL MES\n\n"
 
-        f"✅ Completados:\n"
-        f"{completados}\n\n"
+            f"🚘 Viajes:\n"
+            f"{viajes}\n\n"
 
-        f"🚫 Cancelados:\n"
-        f"{cancelados}\n\n"
+            f"✅ Completados:\n"
+            f"{completados}\n\n"
 
-        f"💰 Ganancia:\n"
-        f"{ganancia_total:,.0f} COP"
+            f"🚫 Cancelados:\n"
+            f"{cancelados}\n\n"
 
-    )
+            f"💰 Ganancia:\n"
+            f"{ganancia_total:,.0f} COP"
+
+        )
 
 # ==========================================
 # OBTENER STATS
 # ==========================================
 def obtener_estadisticas():
 
-    # ======================================
-    # TOTAL VIAJES
-    # ======================================
+    with state.STATE_LOCK:
 
-    cursor.execute("""
-    SELECT COUNT(*)
-    FROM viajes
-    """)
+        # ======================================
+        # TOTAL VIAJES
+        # ======================================
 
-    total = cursor.fetchone()[0]
+        cursor.execute("""
+        SELECT COUNT(*)
+        FROM viajes
+        """)
 
-    # ======================================
-    # GANANCIA TOTAL
-    # ======================================
+        total = cursor.fetchone()[0]
 
-    cursor.execute("""
-    SELECT SUM(dinero)
-    FROM viajes
-    WHERE estado='completado'
-    """)
+        # ======================================
+        # GANANCIA TOTAL
+        # ======================================
 
-    dinero_total = cursor.fetchone()[0]
+        cursor.execute("""
+        SELECT SUM(dinero)
+        FROM viajes
+        WHERE estado='completado'
+        """)
 
-    if dinero_total is None:
-        dinero_total = 0
+        dinero_total = cursor.fetchone()[0]
 
-    # ======================================
-    # PROMEDIO SCORE
-    # ======================================
+        if dinero_total is None:
+            dinero_total = 0
 
-    cursor.execute("""
-    SELECT AVG(score_visual)
-    FROM viajes
-    WHERE estado='completado'
-    """)
+        # ======================================
+        # PROMEDIO SCORE
+        # ======================================
 
-    promedio = cursor.fetchone()[0]
+        cursor.execute("""
+        SELECT AVG(score_visual)
+        FROM viajes
+        WHERE estado='completado'
+        """)
 
-    if promedio is None:
-        promedio = 0
+        promedio = cursor.fetchone()[0]
 
-    promedio = round(promedio, 1)
+        if promedio is None:
+            promedio = 0
 
-    # ======================================
-    # COMPLETADOS
-    # ======================================
+        promedio = round(promedio, 1)
 
-    cursor.execute("""
-    SELECT COUNT(*)
-    FROM viajes
-    WHERE estado='completado'
-    """)
+        # ======================================
+        # COMPLETADOS
+        # ======================================
 
-    completados = cursor.fetchone()[0]
+        cursor.execute("""
+        SELECT COUNT(*)
+        FROM viajes
+        WHERE estado='completado'
+        """)
 
-    # ======================================
-    # CANCELADOS
-    # ======================================
+        completados = cursor.fetchone()[0]
 
-    cursor.execute("""
-    SELECT COUNT(*)
-    FROM viajes
-    WHERE estado='cancelado'
-    """)
+        # ======================================
+        # CANCELADOS
+        # ======================================
 
-    cancelados = cursor.fetchone()[0]
+        cursor.execute("""
+        SELECT COUNT(*)
+        FROM viajes
+        WHERE estado='cancelado'
+        """)
 
-    # ======================================
-    # COMBUSTIBLE
-    # ======================================
+        cancelados = cursor.fetchone()[0]
 
-    gasto_combustible = (
-        calcular_gasto_combustible_total()
-    )
+        # ======================================
+        # COMBUSTIBLE
+        # ======================================
 
-    combustible_restante = (
-        calcular_combustible_restante()
-    )
+        gasto_combustible = (
+            calcular_gasto_combustible_total()
+        )
 
-    ganancia_neta = (
-        dinero_total - gasto_combustible
-    )
+        combustible_restante = (
+            calcular_combustible_restante()
+        )
 
-    # ======================================
-    # RESPUESTA
-    # ======================================
+        ganancia_neta = (
+            dinero_total - gasto_combustible
+        )
 
-    respuesta = (
+        # ======================================
+        # RESPUESTA
+        # ======================================
 
-        "📊 ESTADÍSTICAS\n\n"
+        respuesta = (
 
-        f"🚘 Viajes:\n{total}\n\n"
+            "📊 ESTADÍSTICAS\n\n"
 
-        f"✅ Completados:\n{completados}\n\n"
+            f"🚘 Viajes:\n{total}\n\n"
 
-        f"🚫 Cancelados:\n{cancelados}\n\n"
+            f"✅ Completados:\n{completados}\n\n"
 
-        f"💰 Ganancia bruta:\n"
-        f"{dinero_total:,.0f} COP\n\n"
+            f"🚫 Cancelados:\n{cancelados}\n\n"
 
-        f"⛽ Gasto combustible:\n"
-        f"{gasto_combustible:,.0f} COP\n\n"
+            f"💰 Ganancia bruta:\n"
+            f"{dinero_total:,.0f} COP\n\n"
 
-        f"🛢 Combustible restante:\n"
-        f"{combustible_restante:,.0f} COP\n\n"
+            f"⛽ Gasto combustible:\n"
+            f"{gasto_combustible:,.0f} COP\n\n"
 
-        f"💵 Ganancia neta:\n"
-        f"{ganancia_neta:,.0f} COP\n\n"
+            f"🛢 Combustible restante:\n"
+            f"{combustible_restante:,.0f} COP\n\n"
 
-        f"⭐ Score promedio:\n"
-        f"{promedio}/10"
-    )
+            f"💵 Ganancia neta:\n"
+            f"{ganancia_neta:,.0f} COP\n\n"
 
-    return respuesta
+            f"⭐ Score promedio:\n"
+            f"{promedio}/10"
+        )
+
+        return respuesta

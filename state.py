@@ -1,3 +1,5 @@
+import threading
+
 usuarios_configurando = {}
 
 usuarios_borrando_fecha = set()
@@ -15,3 +17,5 @@ viaje_pendiente = None
 vista_actual = "curso"
 
 message_id_operativo = None
+
+STATE_LOCK = threading.RLock()

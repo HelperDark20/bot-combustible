@@ -1,17 +1,9 @@
 # ==========================================
 # IMPORTS
 # ==========================================
-from state import (
 
-    viaje_en_curso,
-    viaje_pendiente,
-    vista_actual,
-    message_id_operativo
-
-)
-
+import uuid
 import state
-
 from score import construir_respuesta
 
 from flask import (
@@ -81,7 +73,7 @@ def upload():
 
         image = request.files["file"]
 
-        ruta = "shortcut.jpg"
+        ruta = f"{uuid.uuid4()}.jpg"
 
         image.save(ruta)
 
@@ -200,7 +192,10 @@ def upload():
                     "reply_markup":
                         reply_markup.to_dict()
 
-                }
+                },
+
+                timeout=10
+
             )
 
         # ==================================
@@ -222,7 +217,10 @@ def upload():
                     "reply_markup":
                         reply_markup.to_dict()
 
-                }
+                },
+
+                timeout=10
+
             )
 
             resultado = response.json()

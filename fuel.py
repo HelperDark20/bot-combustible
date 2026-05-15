@@ -3,6 +3,7 @@
 # CONFIGURACIÓN Y CÁLCULOS COMBUSTIBLE
 # =========================================
 
+import state
 import sqlite3
 
 from config import (
@@ -40,20 +41,22 @@ def crear_tabla_config():
 
 def guardar_config(clave, valor):
 
-    conn = sqlite3.connect("viajes.db")
-    cursor = conn.cursor()
+    with state.STATE_LOCK:
 
-    cursor.execute("""
+        conn = sqlite3.connect("viajes.db")
+        cursor = conn.cursor()
 
-        INSERT OR REPLACE INTO configuracion
-        (clave, valor)
+        cursor.execute("""
 
-        VALUES (?, ?)
+            INSERT OR REPLACE INTO configuracion
+            (clave, valor)
 
-    """, (clave, valor))
+            VALUES (?, ?)
 
-    conn.commit()
-    conn.close()
+        """, (clave, valor))
+
+        conn.commit()
+        conn.close()
 
 # =========================================
 # OBTENER CONFIG
@@ -61,38 +64,40 @@ def guardar_config(clave, valor):
 
 def obtener_config(clave):
 
-    conn = sqlite3.connect("viajes.db")
-    cursor = conn.cursor()
+    with state.STATE_LOCK:
 
-    cursor.execute("""
+        conn = sqlite3.connect("viajes.db")
+        cursor = conn.cursor()
 
-        SELECT valor
-        FROM configuracion
+        cursor.execute("""
 
-        WHERE clave = ?
+            SELECT valor
+            FROM configuracion
 
-    """, (clave,))
+            WHERE clave = ?
 
-    resultado = cursor.fetchone()
+        """, (clave,))
 
-    conn.close()
+        resultado = cursor.fetchone()
 
-    if resultado:
-        return resultado[0]
+        conn.close()
 
-    # =========================
-    # DEFAULTS
-    # =========================
+        if resultado:
+            return resultado[0]
 
-    defaults = {
+        # =========================
+        # DEFAULTS
+        # =========================
 
-        "km_l": DEFAULT_KM_L,
-        "valor_galon": DEFAULT_VALOR_GALON,
-        "tanque": DEFAULT_TANQUE
+        defaults = {
 
-    }
+            "km_l": DEFAULT_KM_L,
+            "valor_galon": DEFAULT_VALOR_GALON,
+            "tanque": DEFAULT_TANQUE
 
-    return defaults.get(clave, 0)
+        }
+
+        return defaults.get(clave, 0)
 
 # =========================================
 # COSTO POR KM
@@ -142,29 +147,31 @@ def calcular_ganancia_neta(
 
 def calcular_gasto_combustible_total():
 
-    costo_km = calcular_costo_km()
+    with state.STATE_LOCK:
 
-    cursor.execute("""
+        costo_km = calcular_costo_km()
 
-    SELECT SUM(distancia_total)
+        cursor.execute("""
 
-    FROM viajes
+        SELECT SUM(distancia_total)
 
-    WHERE estado='completado'
+        FROM viajes
 
-    """)
+        WHERE estado='completado'
 
-    resultado = cursor.fetchone()[0]
+        """)
 
-    if resultado is None:
+        resultado = cursor.fetchone()[0]
 
-        resultado = 0
+        if resultado is None:
 
-    gasto_total = (
-        resultado * costo_km
-    )
+            resultado = 0
 
-    return round(gasto_total, 2)
+        gasto_total = (
+            resultado * costo_km
+        )
+
+        return round(gasto_total, 2)
 
 # =========================================
 # COMBUSTIBLE RESTANTE

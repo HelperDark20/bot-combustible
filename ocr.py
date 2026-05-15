@@ -2,9 +2,8 @@
 # IMPORTS
 # ==========================================
 from PIL import Image
-
+import uuid
 import base64
-
 from config import client
 
 # ==========================================
@@ -38,7 +37,7 @@ def optimizar_imagen(ruta_original):
 
     crop.thumbnail((700, 700))
 
-    ruta_final = "optimized.jpg"
+    ruta_final = f"{uuid.uuid4()}.jpg"
 
     if crop.mode in ("RGBA", "P"):
         crop = crop.convert("RGB")
@@ -69,56 +68,66 @@ def analizar_imagen_openai(ruta_imagen):
             img_file.read()
         ).decode("utf-8")
 
-    respuesta = client.chat.completions.create(
+    try:
 
-        model="gpt-4o-mini",
+        respuesta = client.chat.completions.create(
 
-        messages=[
+            model="gpt-4o-mini",
 
-            {
-                "role": "system",
+            messages=[
 
-                "content":
-                    "Extrae datos Uber Driver. Solo JSON."
-            },
+                {
+                    "role": "system",
 
-            {
-                "role": "user",
+                    "content":
+                        "Extrae datos Uber Driver. Solo JSON."
+                },
 
-                "content": [
+                {
+                    "role": "user",
 
-                    {
-                        "type": "text",
+                    "content": [
 
-                        "text":
-
-                        """
                         {
-                        "tipo_viaje":"",
-                        "dinero":0,
-                        "distancia_recogida_km":0,
-                        "distancia_destino_km":0,
-                        "tiempo_recogida_min":0,
-                        "tiempo_destino_min":0
+                            "type": "text",
+
+                            "text":
+
+                            """
+                            {
+                            "tipo_viaje":"",
+                            "dinero":0,
+                            "distancia_recogida_km":0,
+                            "distancia_destino_km":0,
+                            "tiempo_recogida_min":0,
+                            "tiempo_destino_min":0
+                            }
+                            """
+                        },
+
+                        {
+                            "type": "image_url",
+
+                            "image_url": {
+
+                                "url":
+                                f"data:image/jpeg;base64,{base64_image}"
+                            }
                         }
-                        """
-                    },
+                    ]
+                }
+            ],
 
-                    {
-                        "type": "image_url",
+            max_tokens=90
+        )
 
-                        "image_url": {
+    except Exception as e:
 
-                            "url":
-                            f"data:image/jpeg;base64,{base64_image}"
-                        }
-                    }
-                ]
-            }
-        ],
+        print(
+            f"🔥 OCR ERROR: {e}"
+        )
 
-        max_tokens=90
-    )
+        return None
 
     contenido = (
 
