@@ -2,6 +2,7 @@
 # IMPORTS
 # ==========================================
 
+from api import registrar_api
 import uuid
 import state
 from score import construir_respuesta
@@ -34,6 +35,11 @@ import json
 # FLASK
 # ==========================================
 flask_app = Flask(__name__)
+
+# ==========================================
+# API
+# ==========================================
+registrar_api(flask_app)
 
 # ==========================================
 # HOME
