@@ -54,6 +54,64 @@ def registrar_api(app):
 
         viaje["porcentaje_usuario"] = porcentaje_usuario
 
+        viaje["distancia_total"] = round(
+
+            viaje.get(
+                "distancia_total",
+                0
+            ),
+
+            1
+
+        )
+
+        viaje["dinero_por_km"] = round(
+
+            viaje.get(
+                "dinero_por_km",
+                0
+            )
+
+        )
+
+        viaje["dinero_por_min"] = round(
+
+            viaje.get(
+                "dinero_por_min",
+                0
+            )
+
+        )
+
+        viaje["ganancia"] = format(
+
+            round(
+                viaje.get(
+                    "ganancia",
+                    0
+                )
+            ),
+
+            ","
+
+        ).replace(",", ".")
+
+        viaje["dinero_por_km"] = format(
+
+            viaje["dinero_por_km"],
+
+            ","
+
+        ).replace(",", ".")
+
+        viaje["dinero_por_min"] = format(
+
+            viaje["dinero_por_min"],
+
+            ","
+
+        ).replace(",", ".")
+
         return render_template(
 
             "overlay.html",

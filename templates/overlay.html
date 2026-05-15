@@ -155,7 +155,7 @@
 
             height: 100%;
 
-            width: {{ viaje.porcentaje_usuario }}%;
+            width: 0%;
 
             background: linear-gradient(90deg, #00ff88, #00c3ff);
 
@@ -292,7 +292,13 @@
 
                 <div class="route-line">
 
-                    <div class="route-progress"></div>
+                    <div
+
+                        class="route-progress"
+
+                        style="width: {{ viaje['porcentaje_usuario'] }}%;"
+
+                    ></div>
 
                 </div>
 
