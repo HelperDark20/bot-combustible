@@ -1,6 +1,7 @@
 from flask import jsonify
 import state
 from flask import render_template
+from flask import redirect
 
 def registrar_api(app):
 
@@ -20,9 +21,7 @@ def registrar_api(app):
                 state.vista_actual
 
         })  
-    @app.route("/overlay")
-
-
+    
     @app.route("/")
 
     def dashboard():
@@ -162,6 +161,52 @@ def registrar_api(app):
             viaje_pendiente=viaje_pendiente
 
         )
+
+    @app.route("/web/finalizar")
+
+    def web_finalizar():
+
+        if state.viaje_en_curso:
+
+            if state.viaje_pendiente:
+
+                state.viaje_en_curso = (
+
+                    state.viaje_pendiente.copy()
+
+                )
+
+                state.viaje_pendiente = None
+
+            else:
+
+                state.viaje_en_curso = None
+
+        return redirect("/")
+
+    @app.route("/web/cancelar")
+
+    def web_cancelar():
+
+        if state.viaje_en_curso:
+
+            if state.viaje_pendiente:
+
+                state.viaje_en_curso = (
+
+                    state.viaje_pendiente.copy()
+
+                )
+
+                state.viaje_pendiente = None
+
+            else:
+
+                state.viaje_en_curso = None
+
+        return redirect("/")
+
+    @app.route("/overlay")
 
     def overlay():
 
