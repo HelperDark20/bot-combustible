@@ -120,23 +120,23 @@
 
             height: 12px;
 
-            background: rgba(255,255,255,0.08);
+            display: flex;
 
-            border-radius: 999px;
-
-            overflow: hidden;
+            position: relative;
 
             margin-top: 24px;
 
+            border-radius: 999px;
+
+            overflow: visible;
+
         }
 
-        .route-progress {
-
-            width: 55%;
+        .route-before {
 
             height: 100%;
 
-            border-radius: 999px;
+            border-radius: 999px 0 0 999px;
 
             background: linear-gradient(
 
@@ -150,9 +150,41 @@
 
             box-shadow:
 
-                0 0 10px rgba(0,255,136,0.45),
+                0 0 10px rgba(0,255,136,0.4),
 
-                0 0 25px rgba(0,195,255,0.35);
+                0 0 20px rgba(0,195,255,0.3);
+
+        }
+
+        .route-after {
+
+            height: 100%;
+
+            border-radius: 0 999px 999px 0;
+
+            background: linear-gradient(
+
+                90deg,
+
+                #7b2cff,
+
+                #ff2cdf
+
+            );
+
+            opacity: 0.85;
+
+        }
+
+        .user-point {
+
+            position: absolute;
+
+            top: -18px;
+
+            transform: translateX(-50%);
+
+            font-size: 18px;
 
         }
 
@@ -164,9 +196,9 @@
 
             margin-top: 12px;
 
-            font-size: 14px;
+            font-size: 18px;
 
-            opacity: 0.85;
+            opacity: 0.9;
 
         }
 
@@ -298,21 +330,39 @@
 
                 <div
 
-                    class="route-progress"
+                    class="route-before"
 
                     style="width: {{ viaje_en_curso.porcentaje_usuario }}%;"
 
                 ></div>
 
+                <div
+
+                    class="route-after"
+
+                    style="width: {{ 100 - viaje_en_curso.porcentaje_usuario }}%;"
+
+                ></div>
+
+                <div
+
+                    class="user-point"
+
+                    style="left: {{ viaje_en_curso.porcentaje_usuario }}%;"
+
+                >
+
+                    📍
+
+                </div>
+
             </div>
 
             <div class="route-labels">
 
-                <span>🚗 Conductor</span>
+                <span>🚗</span>
 
-                <span>📍 Usuario</span>
-
-                <span>📌 Destino</span>
+                <span>📌</span>
 
             </div>
 
@@ -404,21 +454,39 @@
 
                 <div
 
-                    class="route-progress"
+                    class="route-before"
 
                     style="width: {{ viaje_pendiente.porcentaje_usuario }}%;"
 
                 ></div>
 
+                <div
+
+                    class="route-after"
+
+                    style="width: {{ 100 - viaje_pendiente.porcentaje_usuario }}%;"
+
+                ></div>
+
+                <div
+
+                    class="user-point"
+
+                    style="left: {{ viaje_pendiente.porcentaje_usuario }}%;"
+
+                >
+
+                    📍
+
+                </div>
+
             </div>
 
             <div class="route-labels">
 
-                <span>🚗 Conductor</span>
+                <span>🚗</span>
 
-                <span>📍 Usuario</span>
-
-                <span>📌 Destino</span>
+                <span>📌</span>
 
             </div>
 
