@@ -65,6 +65,24 @@ def registrar_api(app):
 
         )
 
+        dinero_por_km = float(
+
+            viaje.get(
+                "dinero_por_km",
+                0
+            ) or 0
+
+        )
+
+        dinero_por_min = float(
+
+            viaje.get(
+                "dinero_por_min",
+                0
+            ) or 0
+
+        )
+
         viaje["dinero_por_km_texto"] = format(
 
             round(dinero_por_km),
