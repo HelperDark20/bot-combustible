@@ -30,6 +30,30 @@ def registrar_api(app):
 
             return "No hay viaje"
 
+        pickup = viaje.get(
+            "distancia_recogida_km",
+            0
+        )
+
+        trayecto = viaje.get(
+            "distancia_destino_km",
+            0
+        )
+
+        total = pickup + trayecto
+
+        if total > 0:
+
+            porcentaje_usuario = int(
+                (pickup / total) * 100
+            )
+
+        else:
+
+            porcentaje_usuario = 50
+
+        viaje["porcentaje_usuario"] = porcentaje_usuario
+
         return render_template(
 
             "overlay.html",

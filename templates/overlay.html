@@ -1,112 +1,84 @@
 <!DOCTYPE html>
-<html>
+                <div class="label">⏱ TIEMPO</div>
+                <div class="value">
+                    {{ viaje.tiempo_total }} min
+                </div>
+            </div>
 
-<head>
-
-    <title>Overlay Viaje</title>
-
-    <style>
-
-        body {
-
-            background: transparent;
-
-            font-family: 'Segoe UI', sans-serif;
-
-            color: white;
-
-            margin: 0;
-
-            padding: 20px;
-        }
-
-        .card {
-
-            width: 350px;
-
-            animation: fadeIn 0.5s ease;
-
-            background: rgba(20,20,20,0.55);
-
-            backdrop-filter: blur(18px);
-
-            border: 1px solid rgba(255,255,255,0.08);
-
-            border-radius: 24px;
-
-            padding: 24px;
-
-            box-shadow:
-
-            0 0 30px rgba(0,0,0,0.45),
-
-            0 0 12px rgba(0,255,153,0.15);
-
-        }
-
-        .money {
-
-            text-shadow: 0 0 12px rgba(0,255,153,0.5);
-
-            font-size: 42px;
-
-            font-weight: bold;
-
-            color: #00ff99;
-        }
-
-        .score {
-
-            font-size: 24px;
-
-            margin-top: 10px;
-        }
-
-        .stats {
-
-            margin-top: 15px;
-
-            font-size: 18px;
-
-            opacity: 0.9;
-        }
-
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-    </style>
-
-</head>
-
-<body>
-
-    <div class="card">
-
-        <div class="money">
-            ${{ viaje.ganancia }}
         </div>
 
-        <div class="score">
-            {{ viaje.score_visual }}
-            {{ viaje.estado_score }}
+        <div class="middle-grid">
+
+            <div class="stat">
+                <div class="label">💵 COP/KM</div>
+                <div class="value">
+                    {{ viaje.dinero_por_km }}
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="label">💸 COP/MIN</div>
+                <div class="value">
+                    {{ viaje.dinero_por_min }}
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="label">⭐ SCORE</div>
+                <div class="value">
+                    {{ viaje.score_visual }}/10
+                </div>
+            </div>
+
         </div>
 
-        <div class="stats">
+        <div class="bottom">
 
-            🚗 {{ viaje.distancia_total }} km
+            <div class="score-row">
 
-            <br><br>
+                <div class="estado">
+                    {{ viaje.estado_score }}
+                </div>
 
-            ⏱️ {{ viaje.tiempo_total }} min
+                <div class="live">
+                    ● EN TIEMPO REAL
+                </div>
 
-            <br><br>
+            </div>
 
-            💸 {{ viaje.dinero_por_km }}/km
+            <div class="route-wrapper">
+
+                <div class="route-line">
+
+                    <div class="route-progress"></div>
+
+                </div>
+
+                <div class="route-points">
+
+                    <div>🚗 Conductor</div>
+
+                    <div>🧍 Usuario</div>
+
+                    <div>📍 Destino</div>
+
+                </div>
+
+            </div>
 
         </div>
 
     </div>
 
-<script> setInterval(() => { location.reload() }, 3000) </script>
+    <script>
+
+        setInterval(() => {
+
+            location.reload()
+
+        }, 3000)
+
+    </script>
 
 </body>
 
