@@ -296,7 +296,13 @@
 
             <div class="route-bar">
 
-                <div class="route-progress"></div>
+                <div
+
+                    class="route-progress"
+
+                    style="width: {{ viaje_en_curso.porcentaje_usuario }}%;"
+
+                ></div>
 
             </div>
 
@@ -372,9 +378,47 @@
 
             </div>
 
+            <div class="stats second-row">
+
+                <div>
+
+                    💵 {{ viaje_pendiente.dinero_por_km }} COP/KM
+
+                </div>
+
+                <div>
+
+                    💸 {{ viaje_pendiente.dinero_por_min }} COP/MIN
+
+                </div>
+
+            </div>
+
             <div>
 
-                {{ viaje_pendiente.estado_score }}
+                🔥 {{ viaje_pendiente.estado_score }}
+
+            </div>
+
+            <div class="route-bar">
+
+                <div
+
+                    class="route-progress"
+
+                    style="width: {{ viaje_pendiente.porcentaje_usuario }}%;"
+
+                ></div>
+
+            </div>
+
+            <div class="route-labels">
+
+                <span>🚗 Conductor</span>
+
+                <span>📍 Usuario</span>
+
+                <span>📌 Destino</span>
 
             </div>
 
