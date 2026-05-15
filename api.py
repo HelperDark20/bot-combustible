@@ -24,8 +24,17 @@ def registrar_api(app):
 
     def overlay():
 
-        viaje = state.viaje_pendiente or state.viaje_en_curso
-        print(viaje)
+        viaje_original = (
+
+            state.viaje_pendiente
+
+            or
+
+            state.viaje_en_curso
+
+        )
+
+        viaje = viaje_original.copy()
 
         if not viaje:
 
