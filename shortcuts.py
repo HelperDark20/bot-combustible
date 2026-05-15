@@ -130,6 +130,34 @@ def upload():
 
             "ganancia": float(data["dinero"]),
 
+            "distancia_recogida_km":
+
+                float(
+
+                    data.get(
+
+                        "distancia_recogida_km",
+
+                        0
+
+                    )
+
+                ),
+
+            "distancia_destino_km":
+
+                float(
+
+                    data.get(
+
+                        "distancia_destino_km",
+
+                        0
+
+                    )
+
+                ),
+
             "distancia_total":
                 resultado_score["distancia_total"],
 
