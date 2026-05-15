@@ -190,15 +190,33 @@
 
         .route-labels {
 
-            display: flex;
+            position: relative;
 
-            justify-content: space-between;
+            width: 100%;
 
-            margin-top: 12px;
+            margin-top: 14px;
 
-            font-size: 18px;
+            height: 24px;
 
-            opacity: 0.9;
+        }
+
+        .start-icon {
+
+            position: absolute;
+
+            left: 0;
+
+            font-size: 20px;
+
+        }
+
+        .end-icon {
+
+            position: absolute;
+
+            right: 0;
+
+            font-size: 20px;
 
         }
 
@@ -326,23 +344,6 @@
 
             </div>
 
-            <div style="margin-bottom: 20px; color: yellow;">
-
-                PICKUP:
-                {{ viaje_en_curso.distancia_recogida_km }}
-
-                <br>
-
-                DESTINO:
-                {{ viaje_en_curso.distancia_destino_km }}
-
-                <br>
-
-                PORCENTAJE:
-                {{ viaje_en_curso.porcentaje_usuario }}
-
-            </div>
-
             <div class="route-bar">
 
                 <div
@@ -377,9 +378,17 @@
 
             <div class="route-labels">
 
-                <span>🚗</span>
+                <span class="start-icon">
 
-                <span>📌</span>
+                    🚗
+
+                </span>
+
+                <span class="end-icon">
+
+                    📌
+
+                </span>
 
             </div>
 
@@ -501,9 +510,17 @@
 
             <div class="route-labels">
 
-                <span>🚗</span>
+                <span class="start-icon">
 
-                <span>📌</span>
+                    🚗
+
+                </span>
+
+                <span class="end-icon">
+
+                    📌
+
+                </span>
 
             </div>
 
