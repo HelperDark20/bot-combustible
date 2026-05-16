@@ -2,7 +2,7 @@
 # PUSH SERVICE
 # ==========================================
 import json
-import base64
+import sqlite3
 from pywebpush import webpush, WebPushException
 
 from config import (
@@ -12,40 +12,61 @@ from config import (
 )
 
 # ==========================================
-# SUBSCRIPTIONS EN MEMORIA
+# CREAR TABLA SUBSCRIPTIONS
 # ==========================================
-subscriptions = []
+def crear_tabla_subscriptions():
+    conn = sqlite3.connect("viajes.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS push_subscriptions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            endpoint TEXT UNIQUE,
+            data TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+crear_tabla_subscriptions()
 
 # ==========================================
 # AGREGAR SUBSCRIPTION
 # ==========================================
 def agregar_subscription(sub):
-
-    # Evitar duplicados por endpoint
-    for s in subscriptions:
-        if s.get("endpoint") == sub.get("endpoint"):
-            return
-
-    subscriptions.append(sub)
-
-    print(f"📲 SUBSCRIPTION AGREGADA: {len(subscriptions)} total")
+    try:
+        conn = sqlite3.connect("viajes.db")
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT OR REPLACE INTO push_subscriptions (endpoint, data)
+            VALUES (?, ?)
+        """, (sub.get("endpoint"), json.dumps(sub)))
+        conn.commit()
+        conn.close()
+        print(f"📲 SUBSCRIPTION GUARDADA EN DB")
+    except Exception as e:
+        print(f"🔥 ERROR GUARDANDO SUBSCRIPTION: {e}")
 
 # ==========================================
 # ENVIAR PUSH
 # ==========================================
 def enviar_push(data: dict):
+    try:
+        conn = sqlite3.connect("viajes.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT endpoint, data FROM push_subscriptions")
+        rows = cursor.fetchall()
+        conn.close()
+    except Exception as e:
+        print(f"🔥 ERROR LEYENDO SUBSCRIPTIONS: {e}")
+        return
 
-    if not subscriptions:
+    if not rows:
         print("⚠️ No hay subscriptions registradas")
         return
 
-    private_key_raw = base64.urlsafe_b64decode(
-        VAPID_PRIVATE_KEY + "=="
-    )
-
-    for sub in subscriptions[:]:
-
+    for endpoint, sub_data in rows:
         try:
+            sub = json.loads(sub_data)
 
             webpush(
                 subscription_info=sub,
@@ -53,16 +74,22 @@ def enviar_push(data: dict):
                 vapid_private_key=VAPID_PRIVATE_KEY,
                 vapid_claims={
                     "sub": VAPID_EMAIL
-                }
+                },
+                content_encoding="aes128gcm"
             )
 
             print("✅ PUSH ENVIADO")
 
         except WebPushException as e:
-
             print(f"🔥 PUSH ERROR: {e}")
 
-            # Si el endpoint ya no existe, remover
             if e.response and e.response.status_code in [404, 410]:
-                subscriptions.remove(sub)
+                conn = sqlite3.connect("viajes.db")
+                cursor = conn.cursor()
+                cursor.execute("DELETE FROM push_subscriptions WHERE endpoint = ?", (endpoint,))
+                conn.commit()
+                conn.close()
                 print("🗑 Subscription removida")
+
+        except Exception as e:
+            print(f"🔥 PUSH ERROR GENERAL: {e}")
