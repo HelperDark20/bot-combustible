@@ -287,13 +287,21 @@ def registrar_api(app):
             ","
 
         ).replace(",", ".")
-
+        
         viaje["dinero_por_min_texto"] = format(
 
             round(dinero_por_min),
 
             ","
 
+        ).replace(",", ".")
+
+        dinero_por_hora = dinero_por_min * 60
+
+        viaje["dinero_por_hora_texto"] = format(
+
+            round(dinero_por_hora), ","
+            
         ).replace(",", ".")
 
         ganancia = float(
