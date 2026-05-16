@@ -207,6 +207,13 @@ def registrar_api(app):
 
         return redirect("/")
 
+    @app.route("/push/register")
+    def push_register():
+        return render_template(
+            "push_register.html",
+            vapid_public_key=VAPID_PUBLIC_KEY
+        )
+
     @app.route("/overlay")
 
     def overlay():

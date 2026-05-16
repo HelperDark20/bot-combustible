@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA Viajes - Activar notificaciones</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0d0d0d;
+      color: white;
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      text-align: center;
+    }
+    .icon { font-size: 64px; margin-bottom: 24px; }
+    h1 { font-size: 24px; font-weight: 800; margin-bottom: 12px; }
+    p { color: rgba(255,255,255,0.5); font-size: 15px; margin-bottom: 32px; line-height: 1.5; }
+    .btn {
+      background: #00ff73;
+      color: #000;
+      border: none;
+      border-radius: 16px;
+      padding: 16px 32px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      width: 100%;
+      max-width: 320px;
+    }
+    .status {
+      margin-top: 24px;
+      font-size: 14px;
+      color: #00ff73;
+      min-height: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="icon">📲</div>
+  <h1>Activar notificaciones</h1>
+  <p>Recibe alertas de nuevos viajes directamente en tu iPhone, encima de Uber.</p>
+  <button class="btn" onclick="activarPush()">Activar notificaciones</button>
+  <div class="status" id="status"></div>
+
+  <script>
+    const VAPID_PUBLIC_KEY = "{{ vapid_public_key }}";
+
+    function urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
+      const rawData = window.atob(base64);
+      const outputArray = new Uint8Array(rawData.length);
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+      }
+      return outputArray;
+    }
+
+    async function activarPush() {
+      const status = document.getElementById("status");
+      try {
+        if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+          status.textContent = "⚠️ Tu navegador no soporta push";
+          return;
+        }
+
+        status.textContent = "Registrando...";
+
+        const reg = await navigator.serviceWorker.register("/sw.js");
+        await navigator.serviceWorker.ready;
+
+        const permiso = await Notification.requestPermission();
+        if (permiso !== "granted") {
+          status.textContent = "⚠️ Debes permitir las notificaciones";
+          return;
+        }
+
+        const sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+
+        const res = await fetch("/push/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(sub.toJSON())
+        });
+
+        if (res.ok) {
+          status.textContent = "✅ Notificaciones activadas!";
+        } else {
+          status.textContent = "❌ Error al registrar";
+        }
+
+      } catch (err) {
+        console.error(err);
+        status.textContent = "❌ Error: " + err.message;
+      }
+    }
+  </script>
+
+</body>
+</html>
