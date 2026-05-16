@@ -50,9 +50,13 @@ def agregar_subscription(sub):
 # ENVIAR PUSH
 # ==========================================
 def enviar_push(data: dict):
+    print(f"🔔 INTENTANDO ENVIAR PUSH...")
     try:
         conn = sqlite3.connect("viajes.db")
         cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM push_subscriptions")
+        count = cursor.fetchone()[0]
+        print(f"📊 SUBSCRIPTIONS EN DB: {count}")
         cursor.execute("SELECT endpoint, data FROM push_subscriptions")
         rows = cursor.fetchall()
         conn.close()
@@ -60,9 +64,6 @@ def enviar_push(data: dict):
         print(f"🔥 ERROR LEYENDO SUBSCRIPTIONS: {e}")
         return
 
-    if not rows:
-        print("⚠️ No hay subscriptions registradas")
-        return
 
     for endpoint, sub_data in rows:
         try:
