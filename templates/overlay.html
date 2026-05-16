@@ -1,451 +1,284 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Overlay IA Viajes</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <style>
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-
-            background: transparent;
-
-            font-family: 'Inter', sans-serif;
-
-            padding: 12px;
-
-            overflow: hidden;
-        }
-
-        .overlay {
-
-            width: 100%;
-
-            max-width: 720px;
-
-            background: #050505;
-
-            border-radius: 34px;
-
-            border: 1px solid rgba(0,255,100,0.22);
-
-            overflow: hidden;
-
-            box-shadow:
-                0 0 25px rgba(0,255,100,0.12),
-                0 15px 45px rgba(0,0,0,0.65);
-
-            animation: fadeIn 0.35s ease;
-        }
-
-        .content {
-
-            padding: 18px 24px;
-        }
-
-        .top-row {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            gap: 22px;
-        }
-
-        .uber {
-
-            font-size: 16px;
-
-            font-weight: 700;
-
-            color: white;
-        }
-
-        .earning {
-
-            font-size: 22px;
-
-            font-weight: 800;
-
-            color: white;
-
-            flex: 1;
-        }
-
-        .earning span {
-
-            font-size: 30px;
-
-            opacity: 0.55;
-
-            font-weight: 500;
-        }
-
-        .price-box {
-
-            min-width: 90px;
-
-            height: 42px;
-
-            border-radius: 14px;
-
-            background: rgba(0,255,100,0.12);
-
-            border: 2px solid rgba(0,255,100,0.75);
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            font-size: 20px;
-
-            font-weight: 800;
-
-            color: #00ff73;
-
-            box-shadow:
-                0 0 20px rgba(0,255,100,0.25);
-        }
-
-        .km-box {
-
-            font-size: 18px;
-
-            font-weight: 800;
-
-            color: white;
-
-            white-space: nowrap;
-        }
-
-        .km-box span {
-
-            font-size: 30px;
-
-            opacity: 0.55;
-
-            font-weight: 500;
-        }
-
-        .middle {
-
-            display: flex;
-
-            align-items: center;
-
-            margin-top: 22px;
-        }
-
-        .icon-circle {
-
-            width: 72px;
-
-            height: 72px;
-
-            border-radius: 50%;
-
-            border: 3px solid #00ff73;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            font-size: 30px;
-
-            color: #00ff73;
-
-            box-shadow:
-                0 0 20px rgba(0,255,100,0.35);
-        }
-
-        .route-line {
-
-            flex: 1;
-
-            height: 10px;
-
-            background: #00ff73;
-
-            margin: 0 22px;
-
-            border-radius: 999px;
-
-            position: relative;
-
-            box-shadow:
-                0 0 18px rgba(0,255,100,0.45);
-        }
-
-        .route-user {
-
-            position: absolute;
-
-            top: 50%;
-
-            transform: translate(-50%, -50%);
-
-            width: 56px;
-
-            height: 56px;
-
-            border-radius: 50%;
-
-            background: #071107;
-
-            border: 3px solid #00ff73;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            font-size: 24px;
-
-            color: #00ff73;
-
-            box-shadow:
-                0 0 18px rgba(0,255,100,0.35);
-        }
-
-        .right-info {
-
-            width: 210px;
-
-            display: flex;
-
-            flex-direction: column;
-
-            gap: 8px;
-
-            align-items: flex-start;
-
-            margin-right: 20px;
-        }
-
-        .time {
-
-            font-size: 16px;
-
-            font-weight: 800;
-
-            color: white;
-        }
-
-        .distance {
-
-            font-size: 14px;
-
-            color: rgba(255,255,255,0.72);
-
-            font-weight: 600;
-        }
-
-        .score {
-
-            font-size: 14px;
-
-            color: white;
-
-            font-weight: 800;
-        }
-
-        .actions {
-
-            display: flex;
-
-            gap: 10px;
-
-            padding: 0 24px 24px 24px;
-
-            margin-top: 22px;
-        }
-
-        .btn {
-
-            flex: 1;
-
-            height: 72px;
-
-            border-radius: 20px;
-
-            border: none;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            font-size: 24px;
-
-            font-weight: 800;
-
-            text-decoration: none;
-
-            transition: 0.2s;
-
-            cursor: pointer;
-        }
-
-        .btn:hover {
-
-            transform: scale(1.02);
-        }
-
-        .accept {
-
-            background: #00ff73;
-
-            color: black;
-
-            box-shadow:
-                0 0 25px rgba(0,255,100,0.28);
-        }
-
-        body {
-
-            display: flex;
-
-            justify-content: center;
-
-            padding-top: 18px;
-        }
-
-        .reject {
-
-            background: rgba(255,0,0,0.16);
-
-            color: #ff3a3a;
-
-            border: 1px solid rgba(255,0,0,0.25);
-        }
-
-        @keyframes fadeIn {
-
-            from {
-
-                opacity: 0;
-
-                transform: translateY(-20px);
-            }
-
-            to {
-
-                opacity: 1;
-
-                transform: translateY(0);
-            }
-        }
-
-    </style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Overlay IA Viajes</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: transparent;
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      /* Empuja el overlay al top, pegado al notch */
+      padding-top: env(safe-area-inset-top, 0px);
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .iphone-notch {
+      width: 126px;
+      height: 34px;
+      background: #000;
+      border-radius: 0 0 20px 20px;
+      margin-bottom: -2px;
+      z-index: 10;
+      position: relative;
+    }
+
+    .di-pill {
+      width: calc(100vw - 24px);
+      max-width: 390px; /* ancho exacto iPhone 16 Pro Max */
+      background: #0d0d0d;
+      border-radius: 26px;
+      border: 1px solid rgba(0,255,100,0.28);
+      box-shadow:
+        0 0 0 1px rgba(0,255,100,0.08),
+        0 0 30px rgba(0,255,100,0.18),
+        0 8px 32px rgba(0,0,0,0.8);
+      overflow: hidden;
+      z-index: 5;
+      animation: expandIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    @keyframes expandIn {
+      from { transform: scaleX(0.35) scaleY(0.55); opacity: 0; }
+      to   { transform: scaleX(1) scaleY(1); opacity: 1; }
+    }
+
+    .di-inner { padding: 14px 18px 0 18px; }
+
+    /* ── Fila superior ── */
+    .top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .top-item {
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .brand {
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-right: 5px;
+    }
+
+    .stat-value {
+      font-size: 15px;
+      font-weight: 800;
+      color: white;
+      white-space: nowrap;
+    }
+
+    .stat-value em {
+      font-style: normal;
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .price-pill {
+      background: rgba(0,255,100,0.1);
+      border: 1.5px solid rgba(0,255,100,0.7);
+      border-radius: 10px;
+      padding: 3px 10px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #00ff73;
+      box-shadow: 0 0 10px rgba(0,255,100,0.2);
+      white-space: nowrap;
+    }
+
+    /* ── Fila ruta ── */
+    .route-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .icon-ring {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid #00ff73;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 10px rgba(0,255,100,0.3);
+      color: #00ff73;
+    }
+
+    .track-wrap {
+      flex: 1;
+      position: relative;
+      height: 6px;
+    }
+
+    .track {
+      width: 100%;
+      height: 6px;
+      background: #00ff73;
+      border-radius: 999px;
+      box-shadow: 0 0 10px rgba(0,255,100,0.4);
+    }
+
+    .stop-bubble {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #0d0d0d;
+      border: 2px solid #00ff73;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: #00ff73;
+      box-shadow: 0 0 8px rgba(0,255,100,0.35);
+    }
+
+    .stats-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 1px;
+      min-width: 52px;
+    }
+
+    .stat-time  { font-size: 11px; font-weight: 700; color: white; }
+    .stat-dist  { font-size: 10px; color: rgba(255,255,255,0.45); font-weight: 600; }
+    .stat-score { font-size: 10px; color: rgba(255,255,255,0.7); font-weight: 600; }
+
+    /* ── Botones ── */
+    .divider {
+      height: 1px;
+      background: rgba(0,255,100,0.08);
+      margin: 0 0 10px 0;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      padding: 0 10px 12px 10px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      flex: 1;
+      height: 48px;
+      border-radius: 16px;
+      border: none;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.15s, opacity 0.15s;
+      font-family: 'Space Grotesk', sans-serif;
+      text-transform: uppercase;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:active { transform: scale(0.97); opacity: 0.85; }
+
+    .btn-accept {
+      background: #00ff73;
+      color: #000;
+      box-shadow: 0 0 18px rgba(0,255,100,0.3);
+    }
+
+    .btn-reject {
+      background: rgba(220,30,30,0.18);
+      color: #ff4444;
+      border: 1px solid rgba(255,60,60,0.3);
+    }
+  </style>
 </head>
-
 <body>
 
-    <div class="overlay">
+  <div class="iphone-notch"></div>
 
-        <div class="content">
+  <div class="di-pill">
+    <div class="di-inner">
 
-            <div class="top-row">
+      <!-- Fila superior: Uber | /hr — ganancia — /km -->
+      <div class="top-row">
+        <div class="top-item">
+          <span class="brand">Uber</span>
+          <span class="stat-value">{{ viaje.dinero_por_hora_texto }}<em>/hr</em></span>
+        </div>
+        <div class="price-pill">{{ viaje.ganancia }}</div>
+        <div class="top-item">
+          <span class="stat-value">{{ viaje.dinero_por_km_texto }}<em>/km</em></span>
+        </div>
+      </div>
 
-                <div class="uber">
-                    Uber
-                </div>
-
-                <div class="earning">
-                    {{ viaje.dinero_por_hora_texto }}<span>/hr</span>
-                </div>
-
-                <div class="price-box">
-                    {{ viaje.ganancia }}
-                </div>
-
-                <div class="km-box">
-                    {{ viaje.dinero_por_km_texto }}<span>/km</span>
-                </div>
-
-            </div>
-
-            <div class="middle">
-
-                <div class="icon-circle">
-                    🚗
-                </div>
-
-                <div class="route-line">
-
-                    <div
-                        class="route-user"
-                        style="left: {{ viaje['porcentaje_usuario'] }}%;"
-                    >
-                        {{ viaje.cantidad_paradas or 1 }}
-                    </div>
-
-                </div>
-
-                <div class="right-info">
-
-                    <div class="time">
-                        {{ viaje.tiempo_total }}min
-                    </div>
-
-                    <div class="distance">
-                        {{ viaje.distancia_total }}km
-                    </div>
-
-                    <div class="score">
-                        ⭐ {{ viaje.score_visual }}/10
-                    </div>
-
-                </div>
-
-                <div class="icon-circle">
-                    📍
-                </div>
-
-            </div>
-
+      <!-- Fila ruta: carro — barra — stats — pin -->
+      <div class="route-row">
+        <div class="icon-ring">
+          <i class="ti ti-car" aria-hidden="true" style="font-size:17px;"></i>
         </div>
 
-        <div class="actions">
-
-            <a href="/web/finalizar" class="btn accept">
-                ✓ ACEPTAR
-            </a>
-
-            <a href="/web/cancelar" class="btn reject">
-                ✕ RECHAZAR
-            </a>
-
+        <div class="track-wrap">
+          <div class="track"></div>
+          <div class="stop-bubble" style="left: {{ viaje['porcentaje_usuario'] }}%;">
+            {{ viaje.cantidad_paradas or 1 }}
+          </div>
         </div>
+
+        <div class="stats-col">
+          <span class="stat-time">{{ viaje.tiempo_total }}min</span>
+          <span class="stat-dist">{{ viaje.distancia_total }}km</span>
+          <span class="stat-score">★ {{ viaje.score_visual }}/10</span>
+        </div>
+
+        <div class="icon-ring">
+          <i class="ti ti-map-pin" aria-hidden="true" style="font-size:16px;"></i>
+        </div>
+      </div>
 
     </div>
 
-</body>
+    <div class="divider"></div>
 
+    <div class="actions">
+      <a href="/web/finalizar" class="btn btn-accept">
+        <i class="ti ti-check" style="font-size:16px;" aria-hidden="true"></i>
+        Aceptar
+      </a>
+      <a href="/web/cancelar" class="btn btn-reject">
+        <i class="ti ti-x" style="font-size:16px;" aria-hidden="true"></i>
+        Rechazar
+      </a>
+    </div>
+  </div>
+
+</body>
 </html>
