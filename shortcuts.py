@@ -141,7 +141,7 @@ def upload():
             print("🔔 LLAMANDO ENVIAR PUSH...")
             enviar_push({
                 "title": f"🚘 Viaje — ${dinero_hora_fmt}/hr",
-                "body": f"⭐{score}/10 · 📍{resultado_score['distancia_total']}km · ⏱{resultado_score['tiempo_total']}min · 💵{km_fmt}/km",
+                "body": f"⭐{score}/10 · 📍{resultado_score['distancia_total']}KM · ⏱{resultado_score['tiempo_total']}MIN · 💵{km_fmt}/KM",
                 "url": "/overlay"
             })
         except Exception as push_error:
@@ -197,3 +197,14 @@ def push_test():
     except Exception as e:
         import traceback
         return traceback.format_exc(), 500
+@flask_app.route("/apple-touch-icon.png")
+def apple_touch_icon():
+    return send_from_directory("static", "icon-192.png")
+
+@flask_app.route("/apple-touch-icon-120x120.png")
+def apple_touch_icon_120():
+    return send_from_directory("static", "icon-192.png")
+
+@flask_app.route("/apple-touch-icon-120x120-precomposed.png")
+def apple_touch_icon_120_pre():
+    return send_from_directory("static", "icon-192.png")
