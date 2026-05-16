@@ -137,11 +137,18 @@ def upload():
         km_fmt = f"{resultado_score['dinero_por_km']:,.0f}".replace(",", ".")
         score = resultado_score["score_visual"]
 
-        enviar_push({
-            "title": f"🚘 Viaje — ${ganancia_fmt}",
-            "body": f"⭐{score}/10  ·  📍{resultado_score['distancia_total']}km  ·  ⏱{resultado_score['tiempo_total']}min  ·  💵{km_fmt}/km",
-            "url": "/overlay"
-        })
+        try:
+            print("🔔 LLAMANDO ENVIAR PUSH...")
+            enviar_push({
+                "title": f"🚘 Viaje — ${ganancia_fmt}",
+                "body": f"⭐{score}/10  ·  📍{resultado_score['distancia_total']}km  ·  ⏱{resultado_score['tiempo_total']}min  ·  💵{km_fmt}/km",
+                "url": "/overlay"
+            })
+            print("🔔 ENVIAR PUSH TERMINADO")
+        except Exception as push_error:
+            print(f"🔥 ERROR EN ENVIAR PUSH: {push_error}")
+            import traceback
+            traceback.print_exc()
 
         # ======================================
         # RENDER OPERATIVO TELEGRAM
