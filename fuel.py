@@ -20,7 +20,7 @@ from database import cursor
 
 def crear_tabla_config():
 
-    conn = sqlite3.connect("viajes.db")
+    conn = sqlite3.connect("/app/data/viajes.db")
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -43,7 +43,7 @@ def guardar_config(clave, valor):
 
     with state.STATE_LOCK:
 
-        conn = sqlite3.connect("viajes.db")
+        conn = sqlite3.connect("/app/data/viajes.db")
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -66,7 +66,7 @@ def obtener_config(clave):
 
     with state.STATE_LOCK:
 
-        conn = sqlite3.connect("viajes.db")
+        conn = sqlite3.connect("/app/data/viajes.db")
         cursor = conn.cursor()
 
         cursor.execute("""

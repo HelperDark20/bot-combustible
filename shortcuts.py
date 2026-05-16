@@ -133,18 +133,17 @@ def upload():
         # ======================================
         # ENVIAR PUSH NOTIFICATION
         # ======================================
-        ganancia_fmt = f"{int(data['dinero']):,}".replace(",", ".")
         km_fmt = f"{resultado_score['dinero_por_km']:,.0f}".replace(",", ".")
+        dinero_hora_fmt = f"{int(resultado_score['dinero_por_hora']):,}".replace(",", ".")
         score = resultado_score["score_visual"]
 
         try:
             print("🔔 LLAMANDO ENVIAR PUSH...")
             enviar_push({
-                "title": f"🚘 Viaje — ${ganancia_fmt}",
-                "body": f"⭐{score}/10  ·  📍{resultado_score['distancia_total']}km  ·  ⏱{resultado_score['tiempo_total']}min  ·  💵{km_fmt}/km",
+                "title": f"🚘 Viaje — ${dinero_hora_fmt}/hr",
+                "body": f"⭐{score}/10 · 📍{resultado_score['distancia_total']}km · ⏱{resultado_score['tiempo_total']}min · 💵{km_fmt}/km",
                 "url": "/overlay"
             })
-            print("🔔 ENVIAR PUSH TERMINADO")
         except Exception as push_error:
             print(f"🔥 ERROR EN ENVIAR PUSH: {push_error}")
             import traceback

@@ -21,9 +21,7 @@ zona_colombia = pytz.timezone(
 # SQLITE
 # ==========================================
 conn = sqlite3.connect(
-
-    "viajes.db",
-
+    "/app/data/viajes.db",
     check_same_thread=False
 )
 

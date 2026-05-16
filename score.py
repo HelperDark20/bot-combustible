@@ -154,6 +154,8 @@ def construir_respuesta(data):
         estado_score
     ) = calcular_score(data)
 
+    dinero_por_hora = round(dinero_por_min * 60, 2)
+
     respuesta = (
 
         f"🚘 {data['tipo_viaje']}\n\n"
@@ -188,6 +190,9 @@ def construir_respuesta(data):
 
         "dinero_por_min":
             dinero_por_min,
+
+        "dinero_por_hora":
+            dinero_por_hora,
 
         "score_visual":
             score_visual,

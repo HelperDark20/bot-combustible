@@ -15,7 +15,7 @@ from config import (
 # CREAR TABLA SUBSCRIPTIONS
 # ==========================================
 def crear_tabla_subscriptions():
-    conn = sqlite3.connect("viajes.db")
+    conn = sqlite3.connect("/app/data/viajes.db")
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS push_subscriptions (
@@ -34,7 +34,7 @@ crear_tabla_subscriptions()
 # ==========================================
 def agregar_subscription(sub):
     try:
-        conn = sqlite3.connect("viajes.db")
+        conn = sqlite3.connect("/app/data/viajes.db")
         cursor = conn.cursor()
         cursor.execute("""
             INSERT OR REPLACE INTO push_subscriptions (endpoint, data)
@@ -52,7 +52,7 @@ def agregar_subscription(sub):
 def enviar_push(data: dict):
     print(f"🔔 INTENTANDO ENVIAR PUSH...")
     try:
-        conn = sqlite3.connect("viajes.db")
+        conn = sqlite3.connect("/app/data/viajes.db")
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM push_subscriptions")
         count = cursor.fetchone()[0]
@@ -85,7 +85,7 @@ def enviar_push(data: dict):
             print(f"🔥 PUSH ERROR: {e}")
 
             if e.response and e.response.status_code in [404, 410]:
-                conn = sqlite3.connect("viajes.db")
+                conn = sqlite3.connect("/app/data/viajes.db")
                 cursor = conn.cursor()
                 cursor.execute("DELETE FROM push_subscriptions WHERE endpoint = ?", (endpoint,))
                 conn.commit()
