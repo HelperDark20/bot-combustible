@@ -185,3 +185,16 @@ def upload():
         import traceback
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
+    
+@flask_app.route("/push/test")
+def push_test():
+    try:
+        enviar_push({
+            "title": "🧪 Test push",
+            "body": "Si ves esto funciona!",
+            "url": "/overlay"
+        })
+        return "Push enviado, revisa el iPhone"
+    except Exception as e:
+        import traceback
+        return traceback.format_exc(), 500

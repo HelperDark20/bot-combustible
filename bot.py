@@ -1,6 +1,8 @@
 # ==========================================
 # IMPORTS
 # ==========================================
+import sys
+sys.stdout.reconfigure(line_buffering=True)
 import threading
 import traceback
 from telegram.ext import (
