@@ -11,7 +11,9 @@ from flask import (
 
     Flask,
     request,
-    jsonify
+    jsonify,
+    send_from_directory
+
 )
 
 from ocr import analizar_imagen_openai
@@ -50,8 +52,20 @@ def home():
     return "BOT IA VIAJES ACTIVO"
 
 # ==========================================
-# UPLOAD SHORTCUTS
+# PWA — manifest y service worker
 # ==========================================
+@flask_app.route("/manifest.json")
+def manifest():
+    return send_from_directory("static", "manifest.json")
+
+@flask_app.route("/sw.js")
+def service_worker():
+    response = send_from_directory("static", "sw.js")
+    response.headers["Cache-Control"] = "no-cache"
+    response.headers["Content-Type"] = "application/javascript"
+    return response
+
+
 @flask_app.route(
 
     "/upload",

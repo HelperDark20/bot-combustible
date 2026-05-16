@@ -7,6 +7,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Overlay IA Viajes</title>
 
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/static/icon-192.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -21,20 +24,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      /* Empuja el overlay al top, pegado al notch */
-      padding-top: env(safe-area-inset-top, 0px);
+      padding: 12px;
       overflow: hidden;
       -webkit-tap-highlight-color: transparent;
-    }
-
-    .iphone-notch {
-      width: 126px;
-      height: 34px;
-      background: #000;
-      border-radius: 0 0 20px 20px;
-      margin-bottom: -2px;
-      z-index: 10;
-      position: relative;
     }
 
     .di-pill {
@@ -223,8 +215,6 @@
 </head>
 <body>
 
-  <div class="iphone-notch"></div>
-
   <div class="di-pill">
     <div class="di-inner">
 
@@ -279,6 +269,12 @@
       </a>
     </div>
   </div>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js");
+    }
+  </script>
 
 </body>
 </html>
