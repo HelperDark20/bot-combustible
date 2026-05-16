@@ -2,6 +2,7 @@ from flask import jsonify
 import state
 from flask import render_template
 from flask import redirect
+from config import VAPID_PUBLIC_KEY
 
 def registrar_api(app):
 
@@ -322,9 +323,7 @@ def registrar_api(app):
         ).replace(",", ".")
 
         return render_template(
-
             "overlay.html",
-
-            viaje=viaje
-
+            viaje=viaje,
+            vapid_public_key=VAPID_PUBLIC_KEY
         )
