@@ -127,11 +127,12 @@ def procesar_imagen(ruta):
         # ======================================
         km_fmt = f"{resultado_score['dinero_por_km']:,.0f}".replace(",", ".")
         dinero_hora_fmt = f"{int(resultado_score['dinero_por_hora']):,}".replace(",", ".")
+        dinero_min_fmt = f"{int(resultado_score['dinero_por_min']):,}".replace(",", ".")
         score = resultado_score["score_visual"]
 
         enviar_push({
-            "title": f"🚘 Viaje — ${dinero_hora_fmt}/hr",
-            "body": f"⭐{score}/10 · 📍{resultado_score['distancia_total']}KM · ⏱{resultado_score['tiempo_total']}MIN · 💵{km_fmt}/KM",
+            "title": f"🚘 Viaje — 💰{dinero_hora_fmt}/hr · 💸{dinero_min_fmt}/min",
+            "body": f"⭐{score}/10 · 📍{resultado_score['distancia_total']}km · ⏱{resultado_score['tiempo_total']}min · 💵{km_fmt}/km",
             "url": "/overlay"
         })
 
