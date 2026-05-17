@@ -31,6 +31,7 @@ from push_service import (
 
 import requests
 import json
+import threading
 
 # ==========================================
 # FLASK
@@ -83,20 +84,10 @@ def push_vapid_key():
     return jsonify({"key": VAPID_PUBLIC_KEY})
 
 # ==========================================
-# UPLOAD
+# PROCESAMIENTO EN BACKGROUND
 # ==========================================
-@flask_app.route("/upload", methods=["POST"])
-def upload():
-
+def procesar_imagen(ruta):
     try:
-
-        if "file" not in request.files:
-            return jsonify({"error": "No image"}), 400
-
-        image = request.files["file"]
-        ruta = f"{uuid.uuid4()}.jpg"
-        image.save(ruta)
-
         respuesta_gpt = analizar_imagen_openai(ruta)
         respuesta_gpt = (
             respuesta_gpt
@@ -123,34 +114,29 @@ def upload():
             "estado_operativo": "curso" if not state.viaje_en_curso else "pendiente"
         }
 
-        if state.viaje_en_curso:
-            state.viaje_pendiente = nuevo_viaje
-            state.vista_actual = "pendiente"
-        else:
-            state.viaje_en_curso = nuevo_viaje
-            state.vista_actual = "curso"
+        with state.STATE_LOCK:
+            if state.viaje_en_curso:
+                state.viaje_pendiente = nuevo_viaje
+                state.vista_actual = "pendiente"
+            else:
+                state.viaje_en_curso = nuevo_viaje
+                state.vista_actual = "curso"
 
         # ======================================
-        # ENVIAR PUSH NOTIFICATION
+        # PUSH
         # ======================================
         km_fmt = f"{resultado_score['dinero_por_km']:,.0f}".replace(",", ".")
         dinero_hora_fmt = f"{int(resultado_score['dinero_por_hora']):,}".replace(",", ".")
         score = resultado_score["score_visual"]
 
-        try:
-            print("🔔 LLAMANDO ENVIAR PUSH...")
-            enviar_push({
-                "title": f"🚘 Viaje — ${dinero_hora_fmt}/hr",
-                "body": f"⭐{score}/10 · 📍{resultado_score['distancia_total']}KM · ⏱{resultado_score['tiempo_total']}MIN · 💵{km_fmt}/KM",
-                "url": "/overlay"
-            })
-        except Exception as push_error:
-            print(f"🔥 ERROR EN ENVIAR PUSH: {push_error}")
-            import traceback
-            traceback.print_exc()
+        enviar_push({
+            "title": f"🚘 Viaje — ${dinero_hora_fmt}/hr",
+            "body": f"⭐{score}/10 · 📍{resultado_score['distancia_total']}KM · ⏱{resultado_score['tiempo_total']}MIN · 💵{km_fmt}/KM",
+            "url": "/overlay"
+        })
 
         # ======================================
-        # RENDER OPERATIVO TELEGRAM
+        # TELEGRAM
         # ======================================
         texto, reply_markup = render_operativo()
 
@@ -177,6 +163,33 @@ def upload():
             )
             resultado = response.json()
             state.message_id_operativo = resultado["result"]["message_id"]
+
+    except Exception as e:
+        import traceback
+        print(f"🔥 ERROR BACKGROUND: {e}")
+        traceback.print_exc()
+
+# ==========================================
+# UPLOAD
+# ==========================================
+@flask_app.route("/upload", methods=["POST"])
+def upload():
+    try:
+        if "file" not in request.files:
+            return jsonify({"error": "No image"}), 400
+
+        image = request.files["file"]
+        ruta = f"{uuid.uuid4()}.jpg"
+        image.save(ruta)
+
+        # Responde inmediatamente al shortcut
+        # y procesa todo en background
+        thread = threading.Thread(
+            target=procesar_imagen,
+            args=(ruta,),
+            daemon=True
+        )
+        thread.start()
 
         return jsonify({"success": True})
 
