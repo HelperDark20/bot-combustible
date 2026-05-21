@@ -1,33 +1,17 @@
 # ==========================================
 # IMPORTS
 # ==========================================
-
 from api import registrar_api
 import uuid
 import state
 from score import construir_respuesta
 
-from flask import (
-    Flask,
-    request,
-    jsonify,
-    send_from_directory
-)
-
+from flask import Flask, request, jsonify, send_from_directory
 from ocr import analizar_imagen_openai
 from database import guardar_viaje
 from ui_operativa import render_operativo
-
-from config import (
-    TOKEN,
-    CHAT_ID,
-    VAPID_PUBLIC_KEY
-)
-
-from push_service import (
-    agregar_subscription,
-    enviar_push
-)
+from config import TOKEN, CHAT_ID, VAPID_PUBLIC_KEY
+from push_service import agregar_subscription, enviar_push
 
 import requests
 import json
@@ -42,13 +26,6 @@ flask_app = Flask(__name__)
 # API
 # ==========================================
 registrar_api(flask_app)
-
-# ==========================================
-# HOME
-# ==========================================
-@flask_app.route("/")
-def home():
-    return "BOT IA VIAJES ACTIVO"
 
 # ==========================================
 # PWA — manifest y service worker
@@ -86,20 +63,8 @@ def push_vapid_key():
 # ==========================================
 # PROCESAMIENTO EN BACKGROUND
 # ==========================================
-def procesar_imagen(ruta):
+def procesar_y_notificar(data, viaje_id, resultado_score):
     try:
-        respuesta_gpt = analizar_imagen_openai(ruta)
-        respuesta_gpt = (
-            respuesta_gpt
-            .replace("```json", "")
-            .replace("```", "")
-            .strip()
-        )
-
-        data = json.loads(respuesta_gpt)
-        viaje_id = guardar_viaje(data)
-        resultado_score = construir_respuesta(data)
-
         nuevo_viaje = {
             "id": viaje_id,
             "ganancia": float(data["dinero"]),
@@ -109,38 +74,31 @@ def procesar_imagen(ruta):
             "tiempo_total": resultado_score["tiempo_total"],
             "dinero_por_km": resultado_score["dinero_por_km"],
             "dinero_por_min": resultado_score["dinero_por_min"],
+            "dinero_por_hora": resultado_score["dinero_por_hora"],
             "score_visual": resultado_score["score_visual"],
             "estado_score": resultado_score["estado_score"],
-            "estado_operativo": "curso" if not state.viaje_en_curso else "pendiente"
         }
 
         with state.STATE_LOCK:
-            if state.viaje_en_curso:
-                state.viaje_pendiente = nuevo_viaje
-                state.vista_actual = "pendiente"
-            else:
-                state.viaje_en_curso = nuevo_viaje
-                state.vista_actual = "curso"
+            state.viaje_nuevo = nuevo_viaje
 
         # ======================================
         # PUSH
         # ======================================
         km_fmt = f"{resultado_score['dinero_por_km']:,.0f}".replace(",", ".")
         dinero_hora_fmt = f"{int(resultado_score['dinero_por_hora']):,}".replace(",", ".")
-        dinero_min_fmt = f"{int(resultado_score['dinero_por_min']):,}".replace(",", ".")
         score = resultado_score["score_visual"]
 
         enviar_push({
-            "title": f"🚘 Viaje — 💰{dinero_hora_fmt}/hr · 💸{dinero_min_fmt}/min",
+            "title": f"🚘 Viaje — 💰{dinero_hora_fmt}/hr",
             "body": f"⭐{score}/10 · 📍{resultado_score['distancia_total']}km · ⏱{resultado_score['tiempo_total']}min · 💵{km_fmt}/km",
-            "url": "/overlay"
+            "url": "/operativo"
         })
 
         # ======================================
         # TELEGRAM
         # ======================================
         texto, reply_markup = render_operativo()
-
         if state.message_id_operativo:
             requests.post(
                 f"https://api.telegram.org/bot{TOKEN}/editMessageText",
@@ -170,15 +128,22 @@ def procesar_imagen(ruta):
         print(f"🔥 ERROR BACKGROUND: {e}")
         traceback.print_exc()
 
-# ==========================================
-# PROCESAMIENTO TEXTO EN BACKGROUND
-# ==========================================
-def procesar_texto(texto):
-
+def procesar_imagen(ruta):
     try:
-        print(f"📝 TEXTO RECIBIDO: {texto}")  # ← agrega esta línea
-        from config import client
+        respuesta_gpt = analizar_imagen_openai(ruta)
+        respuesta_gpt = respuesta_gpt.replace("```json", "").replace("```", "").strip()
+        data = json.loads(respuesta_gpt)
+        viaje_id = guardar_viaje(data)
+        resultado_score = construir_respuesta(data)
+        procesar_y_notificar(data, viaje_id, resultado_score)
+    except Exception as e:
+        import traceback
+        print(f"🔥 ERROR IMAGEN: {e}")
+        traceback.print_exc()
 
+def procesar_texto(texto):
+    try:
+        from config import client
         respuesta = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -204,76 +169,15 @@ Texto de Uber Driver:
             ],
             max_tokens=120
         )
-
         contenido = respuesta.choices[0].message.content
         contenido = contenido.replace("```json", "").replace("```", "").strip()
         data = json.loads(contenido)
-
         viaje_id = guardar_viaje(data)
         resultado_score = construir_respuesta(data)
-
-        nuevo_viaje = {
-            "id": viaje_id,
-            "ganancia": float(data["dinero"]),
-            "distancia_recogida_km": float(data.get("distancia_recogida_km", 0)),
-            "distancia_destino_km": float(data.get("distancia_destino_km", 0)),
-            "distancia_total": resultado_score["distancia_total"],
-            "tiempo_total": resultado_score["tiempo_total"],
-            "dinero_por_km": resultado_score["dinero_por_km"],
-            "dinero_por_min": resultado_score["dinero_por_min"],
-            "score_visual": resultado_score["score_visual"],
-            "estado_score": resultado_score["estado_score"],
-            "estado_operativo": "curso" if not state.viaje_en_curso else "pendiente"
-        }
-
-        with state.STATE_LOCK:
-            if state.viaje_en_curso:
-                state.viaje_pendiente = nuevo_viaje
-                state.vista_actual = "pendiente"
-            else:
-                state.viaje_en_curso = nuevo_viaje
-                state.vista_actual = "curso"
-
-        km_fmt = f"{resultado_score['dinero_por_km']:,.0f}".replace(",", ".")
-        dinero_hora_fmt = f"{int(resultado_score['dinero_por_hora']):,}".replace(",", ".")
-        dinero_min_fmt = f"{int(resultado_score['dinero_por_min']):,}".replace(",", ".")
-        score = resultado_score["score_visual"]
-
-        enviar_push({
-            "title": f"🚘 Viaje — 💰{dinero_hora_fmt}/hr · 💸{dinero_min_fmt}/min",
-            "body": f"⭐{score}/10 · 📍{resultado_score['distancia_total']}km · ⏱{resultado_score['tiempo_total']}min · 💵{km_fmt}/km",
-            "url": "/overlay"
-        })
-
-        texto_telegram, reply_markup = render_operativo()
-
-        if state.message_id_operativo:
-            requests.post(
-                f"https://api.telegram.org/bot{TOKEN}/editMessageText",
-                json={
-                    "chat_id": CHAT_ID,
-                    "message_id": state.message_id_operativo,
-                    "text": texto_telegram,
-                    "reply_markup": reply_markup.to_dict()
-                },
-                timeout=10
-            )
-        else:
-            response = requests.post(
-                f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-                json={
-                    "chat_id": CHAT_ID,
-                    "text": texto_telegram,
-                    "reply_markup": reply_markup.to_dict()
-                },
-                timeout=10
-            )
-            resultado = response.json()
-            state.message_id_operativo = resultado["result"]["message_id"]
-
+        procesar_y_notificar(data, viaje_id, resultado_score)
     except Exception as e:
         import traceback
-        print(f"🔥 ERROR BACKGROUND TEXTO: {e}")
+        print(f"🔥 ERROR TEXTO: {e}")
         traceback.print_exc()
 
 # ==========================================
@@ -285,62 +189,52 @@ def upload_text():
         data_json = request.get_json()
         if not data_json or "texto" not in data_json:
             return jsonify({"error": "No text"}), 400
-
-        texto = data_json["texto"]
-
-        thread = threading.Thread(
-            target=procesar_texto,
-            args=(texto,),
-            daemon=True
-        )
+        thread = threading.Thread(target=procesar_texto, args=(data_json["texto"],), daemon=True)
         thread.start()
-
         return jsonify({"success": True})
-
     except Exception as e:
         import traceback
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
-
+# ==========================================
+# UPLOAD IMAGE
+# ==========================================
 @flask_app.route("/upload", methods=["POST"])
 def upload():
     try:
         if "file" not in request.files:
             return jsonify({"error": "No image"}), 400
-
         image = request.files["file"]
         ruta = f"{uuid.uuid4()}.jpg"
         image.save(ruta)
-
-        # Responde inmediatamente al shortcut
-        # y procesa todo en background
-        thread = threading.Thread(
-            target=procesar_imagen,
-            args=(ruta,),
-            daemon=True
-        )
+        thread = threading.Thread(target=procesar_imagen, args=(ruta,), daemon=True)
         thread.start()
-
         return jsonify({"success": True})
-
     except Exception as e:
         import traceback
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
-    
+
+# ==========================================
+# PUSH TEST
+# ==========================================
 @flask_app.route("/push/test")
 def push_test():
     try:
         enviar_push({
             "title": "🧪 Test push",
             "body": "Si ves esto funciona!",
-            "url": "/overlay"
+            "url": "/operativo"
         })
         return "Push enviado, revisa el iPhone"
     except Exception as e:
         import traceback
         return traceback.format_exc(), 500
+
+# ==========================================
+# ICONOS APPLE
+# ==========================================
 @flask_app.route("/apple-touch-icon.png")
 def apple_touch_icon():
     return send_from_directory("static", "icon-192.png")

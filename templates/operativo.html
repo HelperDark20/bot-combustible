@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="apple-touch-icon" href="/static/icon-192.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>IA Viajes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --green: #00ff73;
+      --green-dim: rgba(0,255,115,0.12);
+      --green-border: rgba(0,255,115,0.25);
+      --red: #ff4444;
+      --red-dim: rgba(255,60,60,0.12);
+      --red-border: rgba(255,60,60,0.25);
+      --yellow: #ffb400;
+      --yellow-dim: rgba(255,180,0,0.1);
+      --yellow-border: rgba(255,180,0,0.25);
+      --bg: #0a0a0a;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.07);
+      --text: white;
+      --text-dim: rgba(255,255,255,0.4);
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ======================================
+       HEADER
+    ====================================== */
+    .header {
+      padding: 52px 20px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .header-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+
+    .dot-live {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ======================================
+       CONTENT
+    ====================================== */
+    .content {
+      padding: 0 16px 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ======================================
+       ESTADO VACÍO
+    ====================================== */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+      gap: 12px;
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      opacity: 0.2;
+    }
+
+    .empty-text {
+      font-size: 16px;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    /* ======================================
+       CARDS
+    ====================================== */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      animation: slideIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(16px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .card-nuevo {
+      border-color: var(--green-border);
+      background: rgba(0,255,115,0.04);
+      box-shadow: 0 0 30px rgba(0,255,115,0.08);
+    }
+
+    .card-curso {
+      border-color: var(--green-border);
+    }
+
+    .card-pendiente {
+      border-color: var(--yellow-border);
+      background: var(--yellow-dim);
+    }
+
+    .card-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .label-nuevo { color: var(--green); }
+    .label-curso { color: var(--green); }
+    .label-pendiente { color: var(--yellow); }
+
+    .card-money {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: -1px;
+    }
+
+    .card-nuevo .card-money { color: var(--green); }
+    .card-pendiente .card-money { color: var(--yellow); }
+
+    .card-meta {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      margin-top: 4px;
+    }
+
+    .score-high { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
+    .score-mid  { background: var(--yellow-dim); color: var(--yellow); border: 1px solid var(--yellow-border); }
+    .score-low  { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-border); }
+
+    /* ======================================
+       BOTONES
+    ====================================== */
+    .btn-row {
+      display: grid;
+      gap: 8px;
+    }
+
+    .btn-row-2 { grid-template-columns: 1fr 1fr; }
+    .btn-row-1 { grid-template-columns: 1fr; }
+
+    .btn {
+      height: 48px;
+      border-radius: 14px;
+      border: none;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: 'Space Grotesk', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      transition: transform 0.12s, opacity 0.12s;
+    }
+
+    .btn:active { transform: scale(0.97); opacity: 0.85; }
+
+    .btn-green {
+      background: var(--green);
+      color: #000;
+      box-shadow: 0 0 18px rgba(0,255,115,0.25);
+    }
+
+    .btn-red {
+      background: var(--red-dim);
+      color: var(--red);
+      border: 1px solid var(--red-border);
+    }
+
+    .btn-gray {
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.7);
+      border: 1px solid var(--border);
+    }
+
+    .btn-yellow {
+      background: var(--yellow-dim);
+      color: var(--yellow);
+      border: 1px solid var(--yellow-border);
+    }
+
+    /* ======================================
+       SUB OPCIONES CANCELAR
+    ====================================== */
+    .cancelar-opts {
+      display: none;
+      margin-top: 10px;
+      animation: fadeIn 0.2s ease both;
+    }
+
+    .cancelar-opts.visible { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .cancelar-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: center;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    /* ======================================
+       BOTTOM NAV
+    ====================================== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10,10,10,0.95);
+      border-top: 1px solid var(--border);
+      padding: 10px 0 24px;
+      display: flex;
+      justify-content: space-around;
+      backdrop-filter: blur(20px);
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      text-decoration: none;
+      cursor: pointer;
+      padding: 4px 12px;
+    }
+
+    .nav-item i { font-size: 22px; color: var(--text-dim); }
+    .nav-item span { font-size: 10px; color: var(--text-dim); font-weight: 600; }
+    .nav-item.active i { color: var(--green); }
+    .nav-item.active span { color: var(--green); }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <p class="header-sub">Panel operativo</p>
+      <p class="header-title">Tiempo real</p>
+    </div>
+    <div class="dot-live"></div>
+  </div>
+
+  <div class="content" id="content">
+    <div class="empty-state">
+      <div class="empty-icon">🚖</div>
+      <p class="empty-text">Sin viajes activos</p>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a class="nav-item active" href="/operativo">
+      <i class="ti ti-steering-wheel"></i>
+      <span>Operativo</span>
+    </a>
+    <a class="nav-item" href="/stats">
+      <i class="ti ti-chart-bar"></i>
+      <span>Stats</span>
+    </a>
+    <a class="nav-item" href="/historial">
+      <i class="ti ti-calendar"></i>
+      <span>Historial</span>
+    </a>
+    <a class="nav-item" href="/config">
+      <i class="ti ti-settings"></i>
+      <span>Config</span>
+    </a>
+  </nav>
+
+  <script>
+    // ==========================================
+    // HELPERS
+    // ==========================================
+    function fmt(n) {
+      return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    function scoreClass(s) {
+      if (s >= 8) return "score-high";
+      if (s >= 5) return "score-mid";
+      return "score-low";
+    }
+
+    function toggleCancelar(id) {
+      const el = document.getElementById(id);
+      el.classList.toggle("visible");
+    }
+
+    // ==========================================
+    // RENDER
+    // ==========================================
+    function renderContent(data) {
+      const { viaje_nuevo, viaje_en_curso, viaje_pendiente } = data;
+      const content = document.getElementById("content");
+
+      if (!viaje_nuevo && !viaje_en_curso && !viaje_pendiente) {
+        content.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🚖</div>
+            <p class="empty-text">Sin viajes activos</p>
+          </div>`;
+        return;
+      }
+
+      let html = "";
+
+      // ======================================
+      // VIAJE NUEVO
+      // ======================================
+      if (viaje_nuevo) {
+        const v = viaje_nuevo;
+        const sc = scoreClass(v.score_visual);
+        html += `
+        <div class="card card-nuevo">
+          <div class="card-label label-nuevo">
+            <i class="ti ti-bell-ringing"></i> Nuevo viaje
+          </div>
+          <div class="card-money">$${fmt(v.ganancia)}</div>
+          <div class="card-meta">
+            <span>📍 ${v.distancia_total}km</span>
+            <span>⏱ ${v.tiempo_total}min</span>
+            <span>💵 ${fmt(v.dinero_por_km)}/km</span>
+            <span>💰 ${fmt(v.dinero_por_hora)}/hr</span>
+          </div>
+          <div class="score-badge ${sc}">⭐ ${v.score_visual}/10 · ${v.estado_score}</div>
+          <div class="btn-row btn-row-2">
+            <a href="/web/aceptar" class="btn btn-green">
+              <i class="ti ti-check" style="font-size:16px;"></i> Aceptar
+            </a>
+            <a href="/web/rechazar" class="btn btn-red">
+              <i class="ti ti-x" style="font-size:16px;"></i> Rechazar
+            </a>
+          </div>
+        </div>`;
+      }
+
+      // ======================================
+      // VIAJE EN CURSO
+      // ======================================
+      if (viaje_en_curso) {
+        const v = viaje_en_curso;
+        const sc = scoreClass(v.score_visual);
+        html += `
+        <div class="card card-curso">
+          <div class="card-label label-curso">
+            <i class="ti ti-car"></i> Viaje en curso
+          </div>
+          <div class="card-money">$${fmt(v.ganancia)}</div>
+          <div class="card-meta">
+            <span>📍 ${v.distancia_total}km</span>
+            <span>⏱ ${v.tiempo_total}min</span>
+            <span>💵 ${fmt(v.dinero_por_km)}/km</span>
+          </div>
+          <div class="score-badge ${sc}">⭐ ${v.score_visual}/10</div>
+          <div class="btn-row btn-row-2">
+            <a href="/web/finalizar" class="btn btn-green">
+              <i class="ti ti-check" style="font-size:16px;"></i> Finalizar
+            </a>
+            <button class="btn btn-red" onclick="toggleCancelar('cancelar-curso')">
+              <i class="ti ti-x" style="font-size:16px;"></i> Cancelar
+            </button>
+          </div>
+          <div class="cancelar-opts" id="cancelar-curso">
+            <p class="cancelar-label">¿Quién canceló?</p>
+            <div class="btn-row btn-row-2">
+              <a href="/web/cancelar/usuario?tipo=curso" class="btn btn-gray" style="font-size:12px; height:42px;">
+                <i class="ti ti-user" style="font-size:14px;"></i> Usuario
+              </a>
+              <a href="/web/cancelar/conductor?tipo=curso" class="btn btn-gray" style="font-size:12px; height:42px;">
+                <i class="ti ti-steering-wheel" style="font-size:14px;"></i> Conductor
+              </a>
+            </div>
+          </div>
+        </div>`;
+      }
+
+      // ======================================
+      // VIAJE PENDIENTE
+      // ======================================
+      if (viaje_pendiente) {
+        const v = viaje_pendiente;
+        const sc = scoreClass(v.score_visual);
+        html += `
+        <div class="card card-pendiente">
+          <div class="card-label label-pendiente">
+            <i class="ti ti-clock"></i> Viaje pendiente
+          </div>
+          <div class="card-money">$${fmt(v.ganancia)}</div>
+          <div class="card-meta">
+            <span>📍 ${v.distancia_total}km</span>
+            <span>⏱ ${v.tiempo_total}min</span>
+            <span>💵 ${fmt(v.dinero_por_km)}/km</span>
+          </div>
+          <div class="score-badge ${sc}">⭐ ${v.score_visual}/10</div>
+          <div class="btn-row btn-row-1">
+            <button class="btn btn-red" onclick="toggleCancelar('cancelar-pendiente')">
+              <i class="ti ti-x" style="font-size:16px;"></i> Cancelar
+            </button>
+          </div>
+          <div class="cancelar-opts" id="cancelar-pendiente">
+            <p class="cancelar-label">¿Quién canceló?</p>
+            <div class="btn-row btn-row-2">
+              <a href="/web/cancelar/usuario?tipo=pendiente" class="btn btn-gray" style="font-size:12px; height:42px;">
+                <i class="ti ti-user" style="font-size:14px;"></i> Usuario
+              </a>
+              <a href="/web/cancelar/conductor?tipo=pendiente" class="btn btn-gray" style="font-size:12px; height:42px;">
+                <i class="ti ti-steering-wheel" style="font-size:14px;"></i> Conductor
+              </a>
+            </div>
+          </div>
+        </div>`;
+      }
+
+      content.innerHTML = html;
+    }
+
+    // ==========================================
+    // POLLING cada 2 segundos
+    // ==========================================
+    async function polling() {
+      try {
+        const res = await fetch("/api/operativo");
+        const data = await res.json();
+        renderContent(data);
+      } catch (e) {
+        console.error("Polling error:", e);
+      }
+    }
+
+    polling();
+    setInterval(polling, 2000);
+
+    // ==========================================
+    // SERVICE WORKER
+    // ==========================================
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js");
+    }
+  </script>
+
+</body>
+</html>

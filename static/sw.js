@@ -1,4 +1,4 @@
-const CACHE = "ia-viajes-v1";
+const CACHE = "ia-viajes-v2";
 
 self.addEventListener("install", (e) => {
   self.skipWaiting();
@@ -31,9 +31,7 @@ self.addEventListener("fetch", (e) => {
 // PUSH — recibir notificación
 // ==========================================
 self.addEventListener("push", (e) => {
-
   let data = {};
-
   try {
     data = e.data.json();
   } catch (err) {
@@ -48,18 +46,8 @@ self.addEventListener("push", (e) => {
     tag: "nuevo-viaje",
     renotify: true,
     data: {
-      url: data.url || "/overlay"
-    },
-    actions: [
-      {
-        action: "aceptar",
-        title: "✅ Aceptar"
-      },
-      {
-        action: "rechazar",
-        title: "❌ Rechazar"
-      }
-    ]
+      url: data.url || "/operativo"
+    }
   };
 
   e.waitUntil(
@@ -68,54 +56,22 @@ self.addEventListener("push", (e) => {
       options
     )
   );
-
 });
 
 // ==========================================
-// NOTIFICATION CLICK
+// NOTIFICATION CLICK — abre /operativo
 // ==========================================
 self.addEventListener("notificationclick", (e) => {
-
   e.notification.close();
 
-  // ======================================
-  // ACEPTAR
-  // ======================================
-  if (e.action === "aceptar") {
-
-    e.waitUntil(
-      fetch("/web/finalizar").then(() => {
-        return self.clients.openWindow("/overlay");
-      })
-    );
-
-  // ======================================
-  // RECHAZAR
-  // ======================================
-  } else if (e.action === "rechazar") {
-
-    e.waitUntil(
-      fetch("/web/cancelar").then(() => {
-        return self.clients.openWindow("/overlay");
-      })
-    );
-
-  // ======================================
-  // TAP NOTIFICACIÓN
-  // ======================================
-  } else {
-
-    e.waitUntil(
-      self.clients.matchAll({ type: "window" }).then((clients) => {
-        for (const client of clients) {
-          if (client.url.includes("/overlay") && "focus" in client) {
-            return client.focus();
-          }
+  e.waitUntil(
+    self.clients.matchAll({ type: "window" }).then((clients) => {
+      for (const client of clients) {
+        if (client.url.includes("/operativo") && "focus" in client) {
+          return client.focus();
         }
-        return self.clients.openWindow("/overlay");
-      })
-    );
-
-  }
-
+      }
+      return self.clients.openWindow("/operativo");
+    })
+  );
 });

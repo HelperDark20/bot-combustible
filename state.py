@@ -10,9 +10,11 @@ message_id_auxiliar = None
 # PANEL OPERATIVO
 # ==========================================
 
-viaje_en_curso = None
+viaje_nuevo = None        # llega notificación, espera Aceptar/Rechazar
 
-viaje_pendiente = None
+viaje_en_curso = None     # fue aceptado, en progreso
+
+viaje_pendiente = None    # hay uno en curso y llegó otro aceptado
 
 vista_actual = "curso"
 
