@@ -174,7 +174,9 @@ def procesar_imagen(ruta):
 # PROCESAMIENTO TEXTO EN BACKGROUND
 # ==========================================
 def procesar_texto(texto):
+
     try:
+        print(f"📝 TEXTO RECIBIDO: {texto}")  # ← agrega esta línea
         from config import client
 
         respuesta = client.chat.completions.create(
