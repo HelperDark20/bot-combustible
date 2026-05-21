@@ -171,8 +171,136 @@ def procesar_imagen(ruta):
         traceback.print_exc()
 
 # ==========================================
-# UPLOAD
+# PROCESAMIENTO TEXTO EN BACKGROUND
 # ==========================================
+def procesar_texto(texto):
+    try:
+        from config import client
+
+        respuesta = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Extrae datos Uber Driver del texto. Solo JSON puro, sin markdown ni explicaciones."
+                },
+                {
+                    "role": "user",
+                    "content": f"""Extrae estos campos y devuelve solo JSON:
+{{
+  "tipo_viaje": "",
+  "dinero": 0,
+  "distancia_recogida_km": 0,
+  "distancia_destino_km": 0,
+  "tiempo_recogida_min": 0,
+  "tiempo_destino_min": 0
+}}
+
+Texto de Uber Driver:
+{texto}"""
+                }
+            ],
+            max_tokens=120
+        )
+
+        contenido = respuesta.choices[0].message.content
+        contenido = contenido.replace("```json", "").replace("```", "").strip()
+        data = json.loads(contenido)
+
+        viaje_id = guardar_viaje(data)
+        resultado_score = construir_respuesta(data)
+
+        nuevo_viaje = {
+            "id": viaje_id,
+            "ganancia": float(data["dinero"]),
+            "distancia_recogida_km": float(data.get("distancia_recogida_km", 0)),
+            "distancia_destino_km": float(data.get("distancia_destino_km", 0)),
+            "distancia_total": resultado_score["distancia_total"],
+            "tiempo_total": resultado_score["tiempo_total"],
+            "dinero_por_km": resultado_score["dinero_por_km"],
+            "dinero_por_min": resultado_score["dinero_por_min"],
+            "score_visual": resultado_score["score_visual"],
+            "estado_score": resultado_score["estado_score"],
+            "estado_operativo": "curso" if not state.viaje_en_curso else "pendiente"
+        }
+
+        with state.STATE_LOCK:
+            if state.viaje_en_curso:
+                state.viaje_pendiente = nuevo_viaje
+                state.vista_actual = "pendiente"
+            else:
+                state.viaje_en_curso = nuevo_viaje
+                state.vista_actual = "curso"
+
+        km_fmt = f"{resultado_score['dinero_por_km']:,.0f}".replace(",", ".")
+        dinero_hora_fmt = f"{int(resultado_score['dinero_por_hora']):,}".replace(",", ".")
+        dinero_min_fmt = f"{int(resultado_score['dinero_por_min']):,}".replace(",", ".")
+        score = resultado_score["score_visual"]
+
+        enviar_push({
+            "title": f"🚘 Viaje — 💰{dinero_hora_fmt}/hr · 💸{dinero_min_fmt}/min",
+            "body": f"⭐{score}/10 · 📍{resultado_score['distancia_total']}km · ⏱{resultado_score['tiempo_total']}min · 💵{km_fmt}/km",
+            "url": "/overlay"
+        })
+
+        texto_telegram, reply_markup = render_operativo()
+
+        if state.message_id_operativo:
+            requests.post(
+                f"https://api.telegram.org/bot{TOKEN}/editMessageText",
+                json={
+                    "chat_id": CHAT_ID,
+                    "message_id": state.message_id_operativo,
+                    "text": texto_telegram,
+                    "reply_markup": reply_markup.to_dict()
+                },
+                timeout=10
+            )
+        else:
+            response = requests.post(
+                f"https://api.telegram.org/bot{TOKEN}/sendMessage",
+                json={
+                    "chat_id": CHAT_ID,
+                    "text": texto_telegram,
+                    "reply_markup": reply_markup.to_dict()
+                },
+                timeout=10
+            )
+            resultado = response.json()
+            state.message_id_operativo = resultado["result"]["message_id"]
+
+    except Exception as e:
+        import traceback
+        print(f"🔥 ERROR BACKGROUND TEXTO: {e}")
+        traceback.print_exc()
+
+# ==========================================
+# UPLOAD TEXT — OCR nativo iOS
+# ==========================================
+@flask_app.route("/upload-text", methods=["POST"])
+def upload_text():
+    try:
+        data_json = request.get_json()
+        if not data_json or "texto" not in data_json:
+            return jsonify({"error": "No text"}), 400
+
+        texto = data_json["texto"]
+
+        thread = threading.Thread(
+            target=procesar_texto,
+            args=(texto,),
+            daemon=True
+        )
+        thread.start()
+
+        return jsonify({"success": True})
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
 @flask_app.route("/upload", methods=["POST"])
 def upload():
     try:
