@@ -90,7 +90,7 @@ def procesar_y_notificar(data, viaje_id, resultado_score):
         score = resultado_score["score_visual"]
 
         enviar_push({
-            "title": f"🚘 Viaje — 💰{dinero_hora_fmt}/Hr · {resultado_score["dinero_por_min"]}/Min",
+            "title": f"🚘 Viaje — 💰{dinero_hora_fmt}/Hr · {resultado_score['dinero_por_min']}/Min",
             "body": f"⭐{score}/10 · 📍{resultado_score['distancia_total']}Km · ⏱{resultado_score['tiempo_total']}Min · 💵{km_fmt}/Km",
             "url": "/operativo"
         })
