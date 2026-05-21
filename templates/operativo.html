@@ -358,6 +358,8 @@
     function toggleCancelar(id) {
       const el = document.getElementById(id);
       el.classList.toggle("visible");
+      // Pausar polling si hay menú abierto
+      pollingActivo = !el.classList.contains("visible");
     }
 
     // ==========================================
@@ -491,7 +493,10 @@
     // ==========================================
     // POLLING cada 2 segundos
     // ==========================================
+    let pollingActivo = true;
+
     async function polling() {
+      if (!pollingActivo) return;
       try {
         const res = await fetch("/api/operativo");
         const data = await res.json();
@@ -501,15 +506,8 @@
       }
     }
 
+    // Solo cargar una vez al abrir la página
     polling();
-    setInterval(polling, 2000);
-
-    // ==========================================
-    // SERVICE WORKER
-    // ==========================================
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js");
-    }
   </script>
 
 </body>
