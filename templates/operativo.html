@@ -507,7 +507,15 @@
     }
 
     // Solo cargar una vez al abrir la página
+    // Cargar al abrir
     polling();
+
+    // Recargar cuando la app vuelve a primer plano
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        polling();
+      }
+    });
   </script>
 
 </body>
