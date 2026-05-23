@@ -88,11 +88,12 @@ def procesar_y_notificar(data, viaje_id, resultado_score):
         km_fmt = f"{resultado_score['dinero_por_km']:,.0f}".replace(",", ".")
         dinero_hora_fmt = f"{int(resultado_score['dinero_por_hora']):,}".replace(",", ".")
         dinero_min_fmt = f"{int(resultado_score['dinero_por_min']):,}".replace(",", ".")
+        distancia_total_fmt = f"{int(resultado_score['distancia_total']):,}".replace(",", ".")
         score = resultado_score["score_visual"]
 
         enviar_push({
             "title": f"🚘 Viaje — 💰{dinero_hora_fmt}/Hr · 💸{dinero_min_fmt}/Min",
-            "body": f"⭐{score}/10 · 📍{resultado_score['distancia_total']}Km · ⏱{resultado_score['tiempo_total']}Min · 💵{km_fmt}/Km",
+            "body": f"⭐{score}/10 · 📍{distancia_total_fmt}Km · ⏱{resultado_score['tiempo_total']}Min · 💵{km_fmt}/Km",
             "url": "/operativo"
         })
 
