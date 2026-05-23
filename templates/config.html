@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="apple-touch-icon" href="/static/icon-192.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>IA Viajes — Config</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --green: #00ff73;
+      --green-dim: rgba(0,255,115,0.12);
+      --green-border: rgba(0,255,115,0.25);
+      --red: #ff4444;
+      --red-dim: rgba(255,60,60,0.12);
+      --red-border: rgba(255,60,60,0.25);
+      --bg: #0a0a0a;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.07);
+      --text: white;
+      --text-dim: rgba(255,255,255,0.4);
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+    }
+
+    .header {
+      padding: 52px 20px 20px;
+    }
+
+    .header-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+
+    .header-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .content {
+      padding: 0 16px 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 4px 0 0;
+    }
+
+    .config-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .config-row {
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .config-row:last-child { border-bottom: none; }
+    .config-row:active { background: rgba(255,255,255,0.04); }
+
+    .config-row-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .config-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--green-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .config-icon i { font-size: 18px; color: var(--green); }
+
+    .config-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .config-desc {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .config-row-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .config-val {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .resumen-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .resumen-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .resumen-label { font-size: 13px; color: var(--text-dim); }
+    .resumen-val { font-size: 13px; font-weight: 700; color: var(--text); }
+    .resumen-val.green { color: var(--green); }
+    .resumen-val.red { color: var(--red); }
+
+    .divider { height: 1px; background: var(--border); }
+
+    .btn-reiniciar {
+      width: 100%;
+      padding: 16px;
+      background: var(--red-dim);
+      border: 1px solid var(--red-border);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      transition: opacity 0.15s;
+    }
+
+    .btn-reiniciar:active { opacity: 0.7; }
+    .btn-reiniciar span { font-size: 14px; font-weight: 700; color: var(--red); }
+
+    /* ======================================
+       SHEET
+    ====================================== */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      display: none;
+      align-items: flex-end;
+    }
+
+    .overlay.visible { display: flex; }
+
+    .sheet {
+      width: 100%;
+      background: #161616;
+      border-radius: 24px 24px 0 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 40px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .overlay.visible .sheet {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      display: flex;
+      justify-content: center;
+      padding: 12px 0 4px;
+    }
+
+    .sheet-handle-bar {
+      width: 36px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.2);
+    }
+
+    .sheet-inner { padding: 16px 20px 20px; }
+
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .sheet-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sheet-title { font-size: 16px; font-weight: 800; color: var(--text); margin: 0; }
+    .sheet-desc { font-size: 12px; color: var(--text-dim); margin: 0; }
+
+    .btn-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-close i { font-size: 16px; color: var(--text-dim); }
+
+    .sheet-actual {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .sheet-input-wrap {
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid var(--green-border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .sheet-prefix {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-dim);
+    }
+
+    .sheet-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      width: 100%;
+    }
+
+    .btn-guardar {
+      width: 100%;
+      height: 52px;
+      background: var(--green);
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 800;
+      color: #000;
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.15s;
+    }
+
+    .btn-guardar:active { opacity: 0.85; }
+
+    /* ======================================
+       BOTTOM NAV
+    ====================================== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10,10,10,0.95);
+      border-top: 1px solid var(--border);
+      padding: 10px 0 24px;
+      display: flex;
+      justify-content: space-around;
+      backdrop-filter: blur(20px);
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      text-decoration: none;
+      padding: 4px 12px;
+    }
+
+    .nav-item i { font-size: 22px; color: var(--text-dim); }
+    .nav-item span { font-size: 10px; color: var(--text-dim); font-weight: 600; }
+    .nav-item.active i { color: var(--green); }
+    .nav-item.active span { color: var(--green); }
+
+    /* CONFIRM REINICIAR */
+    .confirm-sheet { display: none; }
+    .confirm-sheet.visible { display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <p class="header-sub">Ajustes</p>
+    <p class="header-title">Configuración</p>
+  </div>
+
+  <div class="content">
+
+    <p class="section-label">Combustible</p>
+
+    <div class="config-card">
+      <div class="config-row" onclick="abrirSheet('km_l')">
+        <div class="config-row-left">
+          <div class="config-icon"><i class="ti ti-gauge"></i></div>
+          <div>
+            <p class="config-name">KM por litro</p>
+            <p class="config-desc">Rendimiento del vehículo</p>
+          </div>
+        </div>
+        <div class="config-row-right">
+          <span class="config-val" id="val-km_l">—</span>
+          <i class="ti ti-chevron-right" style="font-size:16px; color:var(--text-dim);"></i>
+        </div>
+      </div>
+      <div class="config-row" onclick="abrirSheet('valor_galon')">
+        <div class="config-row-left">
+          <div class="config-icon"><i class="ti ti-droplet"></i></div>
+          <div>
+            <p class="config-name">Valor galón</p>
+            <p class="config-desc">Precio actual del combustible</p>
+          </div>
+        </div>
+        <div class="config-row-right">
+          <span class="config-val" id="val-valor_galon">—</span>
+          <i class="ti ti-chevron-right" style="font-size:16px; color:var(--text-dim);"></i>
+        </div>
+      </div>
+      <div class="config-row" onclick="abrirSheet('tanque')">
+        <div class="config-row-left">
+          <div class="config-icon"><i class="ti ti-fuel"></i></div>
+          <div>
+            <p class="config-name">Presupuesto tanque</p>
+            <p class="config-desc">Costo de llenar el tanque</p>
+          </div>
+        </div>
+        <div class="config-row-right">
+          <span class="config-val" id="val-tanque">—</span>
+          <i class="ti ti-chevron-right" style="font-size:16px; color:var(--text-dim);"></i>
+        </div>
+      </div>
+    </div>
+
+    <p class="section-label">Resumen combustible</p>
+
+    <div class="resumen-card">
+      <div class="resumen-row">
+        <span class="resumen-label">Costo por km</span>
+        <span class="resumen-val" id="res-costo_km">—</span>
+      </div>
+      <div class="resumen-row">
+        <span class="resumen-label">Gasto total</span>
+        <span class="resumen-val red" id="res-gasto_total">—</span>
+      </div>
+      <div class="divider"></div>
+      <div class="resumen-row">
+        <span class="resumen-label">Restante tanque</span>
+        <span class="resumen-val green" id="res-restante">—</span>
+      </div>
+    </div>
+
+    <p class="section-label">Acciones</p>
+
+    <button class="btn-reiniciar" onclick="confirmarReinicio()">
+      <i class="ti ti-trash" style="font-size:18px; color:var(--red);"></i>
+      <span>Reiniciar día</span>
+    </button>
+
+  </div>
+
+  <!-- SHEET EDITAR -->
+  <div class="overlay" id="overlay" onclick="cerrarSheet(event)">
+    <div class="sheet" id="sheet">
+      <div class="sheet-handle">
+        <div class="sheet-handle-bar"></div>
+      </div>
+      <div class="sheet-inner">
+        <div class="sheet-header">
+          <div class="sheet-header-left">
+            <div class="config-icon"><i class="ti ti-gauge" id="sheet-icon"></i></div>
+            <div>
+              <p class="sheet-title" id="sheet-title">KM por litro</p>
+              <p class="sheet-desc" id="sheet-desc">Rendimiento del vehículo</p>
+            </div>
+          </div>
+          <button class="btn-close" onclick="cerrarSheet()">
+            <i class="ti ti-x"></i>
+          </button>
+        </div>
+        <p class="sheet-actual" id="sheet-actual">Valor actual: —</p>
+        <div class="sheet-input-wrap">
+          <span class="sheet-prefix" id="sheet-prefix">$</span>
+          <input class="sheet-input" type="number" id="sheet-input" inputmode="decimal" placeholder="0">
+        </div>
+        <button class="btn-guardar" onclick="guardar()">
+          <i class="ti ti-check" style="font-size:18px;"></i>
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHEET CONFIRMAR REINICIO -->
+  <div class="overlay" id="overlay-reinicio" onclick="cerrarReinicio(event)">
+    <div class="sheet" id="sheet-reinicio">
+      <div class="sheet-handle">
+        <div class="sheet-handle-bar"></div>
+      </div>
+      <div class="sheet-inner">
+        <div style="text-align:center; padding:8px 0 20px;">
+          <div style="width:56px; height:56px; border-radius:50%; background:var(--red-dim); border:1.5px solid var(--red-border); display:flex; align-items:center; justify-content:center; margin:0 auto 14px;">
+            <i class="ti ti-trash" style="font-size:24px; color:var(--red);"></i>
+          </div>
+          <p style="font-size:18px; font-weight:800; color:var(--text); margin-bottom:8px;">Reiniciar día</p>
+          <p style="font-size:14px; color:var(--text-dim); line-height:1.5;">Se borrarán todos los viajes de hoy. Esta acción no se puede deshacer.</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <button onclick="ejecutarReinicio()" style="width:100%; height:52px; background:var(--red-dim); border:1px solid var(--red-border); border-radius:14px; font-size:15px; font-weight:800; color:var(--red); cursor:pointer; font-family:'Space Grotesk',sans-serif;">
+            Sí, reiniciar
+          </button>
+          <button onclick="cerrarReinicio()" style="width:100%; height:52px; background:var(--card); border:1px solid var(--border); border-radius:14px; font-size:15px; font-weight:700; color:var(--text-dim); cursor:pointer; font-family:'Space Grotesk',sans-serif;">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a class="nav-item" href="/inicio">
+      <i class="ti ti-home"></i>
+      <span>Inicio</span>
+    </a>
+    <a class="nav-item" href="/operativo">
+      <i class="ti ti-steering-wheel"></i>
+      <span>Operativo</span>
+    </a>
+    <a class="nav-item" href="/stats">
+      <i class="ti ti-chart-bar"></i>
+      <span>Stats</span>
+    </a>
+    <a class="nav-item active" href="/config">
+      <i class="ti ti-settings"></i>
+      <span>Config</span>
+    </a>
+  </nav>
+
+  <script>
+    const campos = {
+      km_l:        { title: "KM por litro",        desc: "Rendimiento del vehículo",       icon: "ti-gauge",   prefix: "",  step: "0.1" },
+      valor_galon: { title: "Valor galón",          desc: "Precio actual del combustible",  icon: "ti-droplet", prefix: "$", step: "1"   },
+      tanque:      { title: "Presupuesto tanque",   desc: "Costo de llenar el tanque",      icon: "ti-fuel",    prefix: "$", step: "1"   }
+    };
+
+    let claveActual = null;
+    let configActual = {};
+
+    function fmt(n) {
+      return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    async function cargarConfig() {
+      try {
+        const res = await fetch("/api/config");
+        configActual = await res.json();
+
+        document.getElementById("val-km_l").textContent = configActual.km_l;
+        document.getElementById("val-valor_galon").textContent = `$${fmt(configActual.valor_galon)}`;
+        document.getElementById("val-tanque").textContent = `$${fmt(configActual.tanque)}`;
+        document.getElementById("res-costo_km").textContent = `$${fmt(configActual.costo_km)}/km`;
+        document.getElementById("res-gasto_total").textContent = `-$${fmt(configActual.gasto_total)}`;
+        document.getElementById("res-restante").textContent = `$${fmt(configActual.restante)}`;
+      } catch(e) {
+        console.error("Error cargando config:", e);
+      }
+    }
+
+    function abrirSheet(clave) {
+      claveActual = clave;
+      const c = campos[clave];
+      document.getElementById("sheet-icon").className = `ti ${c.icon}`;
+      document.getElementById("sheet-title").textContent = c.title;
+      document.getElementById("sheet-desc").textContent = c.desc;
+      document.getElementById("sheet-prefix").textContent = c.prefix;
+      document.getElementById("sheet-input").step = c.step;
+      document.getElementById("sheet-input").value = configActual[clave] || "";
+
+      const valActual = clave === "km_l"
+        ? configActual.km_l
+        : `$${fmt(configActual[clave])}`;
+      document.getElementById("sheet-actual").textContent = `Valor actual: ${valActual}`;
+
+      document.getElementById("overlay").classList.add("visible");
+      setTimeout(() => document.getElementById("sheet-input").focus(), 350);
+    }
+
+    function cerrarSheet(e) {
+      if (e && e.target !== document.getElementById("overlay")) return;
+      document.getElementById("overlay").classList.remove("visible");
+      claveActual = null;
+    }
+
+    async function guardar() {
+      const val = parseFloat(document.getElementById("sheet-input").value);
+      if (!val || val <= 0) return;
+
+      try {
+        await fetch("/api/config", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ clave: claveActual, valor: val })
+        });
+        document.getElementById("overlay").classList.remove("visible");
+        claveActual = null;
+        cargarConfig();
+      } catch(e) {
+        console.error("Error guardando:", e);
+      }
+    }
+
+    function confirmarReinicio() {
+      document.getElementById("overlay-reinicio").classList.add("visible");
+    }
+
+    function cerrarReinicio(e) {
+      if (e && e.target !== document.getElementById("overlay-reinicio")) return;
+      document.getElementById("overlay-reinicio").classList.remove("visible");
+    }
+
+    async function ejecutarReinicio() {
+      try {
+        await fetch("/api/reiniciar-dia", { method: "POST" });
+        document.getElementById("overlay-reinicio").classList.remove("visible");
+        cargarConfig();
+      } catch(e) {
+        console.error("Error reiniciando:", e);
+      }
+    }
+
+    cargarConfig();
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") cargarConfig();
+    });
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js");
+    }
+  </script>
+
+</body>
+</html>
