@@ -296,10 +296,6 @@
       <i class="ti ti-chart-bar"></i>
       <span>Stats</span>
     </a>
-      <a class="nav-item" href="/historial">
-      <i class="ti ti-calendar"></i>
-      <span>Historial</span>
-    </a>
     <a class="nav-item" href="/config">
       <i class="ti ti-settings"></i>
       <span>Config</span>
@@ -400,7 +396,7 @@
                 <div class="dot" style="background:rgba(150,150,150,0.5);"></div>
                 <span class="desglose-label">Rechazados</span>
               </div>
-              <span class="desglose-val">${d.total - d.completados - d.cancelados}</span>
+              <span class="desglose-val">${d.rechazados || 0}</span>
             </div>
             <div class="desglose-row">
               <div class="desglose-left">

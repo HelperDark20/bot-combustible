@@ -283,10 +283,17 @@ def registrar_api(app):
 
             cursor.execute("""
                 SELECT COUNT(*) FROM viajes
-                WHERE estado IN ('cancelado_usuario','cancelado_conductor','rechazado')
+                WHERE estado IN ('cancelado_usuario','cancelado_conductor')
                 AND DATE(fecha) = DATE('now', '-5 hours')
             """)
             cancelados = cursor.fetchone()[0]
+
+            cursor.execute("""
+                SELECT COUNT(*) FROM viajes
+                WHERE estado='rechazado'
+                AND DATE(fecha) = DATE('now', '-5 hours')
+            """)
+            rechazados_hoy = cursor.fetchone()[0]
 
             cursor.execute("""
                 SELECT SUM(dinero) FROM viajes
@@ -313,6 +320,7 @@ def registrar_api(app):
                 "total": total,
                 "completados": completados,
                 "cancelados": cancelados,
+                "rechazados": rechazados_hoy,
                 "ganancia": ganancia,
                 "score_prom": round(score_prom, 1),
                 "km_total": round(km_total, 1)
@@ -338,10 +346,17 @@ def registrar_api(app):
 
             cursor.execute("""
                 SELECT COUNT(*) FROM viajes
-                WHERE estado IN ('cancelado_usuario','cancelado_conductor','rechazado')
+                WHERE estado IN ('cancelado_usuario','cancelado_conductor')
                 AND strftime('%W', fecha) = strftime('%W', 'now', '-5 hours')
             """)
             cancelados = cursor.fetchone()[0]
+
+            cursor.execute("""
+                SELECT COUNT(*) FROM viajes
+                WHERE estado='rechazado'
+                AND strftime('%W', fecha) = strftime('%W', 'now', '-5 hours')
+            """)
+            rechazados_semana = cursor.fetchone()[0]
 
             cursor.execute("""
                 SELECT SUM(dinero) FROM viajes WHERE estado='completado'
@@ -365,6 +380,7 @@ def registrar_api(app):
                 "total": total,
                 "completados": completados,
                 "cancelados": cancelados,
+                "rechazados": rechazados_semana,
                 "ganancia": ganancia,
                 "score_prom": round(score_prom, 1),
                 "km_total": round(km_total, 1)
@@ -390,10 +406,17 @@ def registrar_api(app):
 
             cursor.execute("""
                 SELECT COUNT(*) FROM viajes
-                WHERE estado IN ('cancelado_usuario','cancelado_conductor','rechazado')
+                WHERE estado IN ('cancelado_usuario','cancelado_conductor')
                 AND strftime('%m%Y', fecha) = strftime('%m%Y', 'now', '-5 hours')
             """)
             cancelados = cursor.fetchone()[0]
+
+            cursor.execute("""
+                SELECT COUNT(*) FROM viajes
+                WHERE estado='rechazado'
+                AND strftime('%m%Y', fecha) = strftime('%m%Y', 'now', '-5 hours')
+            """)
+            rechazados_mes = cursor.fetchone()[0]
 
             cursor.execute("""
                 SELECT SUM(dinero) FROM viajes WHERE estado='completado'
@@ -417,6 +440,7 @@ def registrar_api(app):
                 "total": total,
                 "completados": completados,
                 "cancelados": cancelados,
+                "rechazados": rechazados_mes,
                 "ganancia": ganancia,
                 "score_prom": round(score_prom, 1),
                 "km_total": round(km_total, 1)
@@ -436,9 +460,12 @@ def registrar_api(app):
 
             cursor.execute("""
                 SELECT COUNT(*) FROM viajes
-                WHERE estado IN ('cancelado_usuario','cancelado_conductor','rechazado')
+                WHERE estado IN ('cancelado_usuario','cancelado_conductor')
             """)
             cancelados = cursor.fetchone()[0]
+
+            cursor.execute("SELECT COUNT(*) FROM viajes WHERE estado='rechazado'")
+            rechazados_total = cursor.fetchone()[0]
 
             cursor.execute("SELECT SUM(dinero) FROM viajes WHERE estado='completado'")
             ganancia = cursor.fetchone()[0] or 0
@@ -453,6 +480,7 @@ def registrar_api(app):
                 "total": total,
                 "completados": completados,
                 "cancelados": cancelados,
+                "rechazados": rechazados_total,
                 "ganancia": ganancia,
                 "score_prom": round(score_prom, 1),
                 "km_total": round(km_total, 1)
