@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="apple-touch-icon" href="/static/icon-192.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>IA Viajes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --green: #00ff73;
+      --green-dim: rgba(0,255,115,0.12);
+      --green-border: rgba(0,255,115,0.25);
+      --red: #ff4444;
+      --red-dim: rgba(255,60,60,0.12);
+      --red-border: rgba(255,60,60,0.25);
+      --yellow: #ffb400;
+      --yellow-dim: rgba(255,180,0,0.1);
+      --yellow-border: rgba(255,180,0,0.25);
+      --gray-dim: rgba(150,150,150,0.1);
+      --gray-border: rgba(150,150,150,0.2);
+      --bg: #0a0a0a;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.07);
+      --text: white;
+      --text-dim: rgba(255,255,255,0.4);
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ======================================
+       HEADER
+    ====================================== */
+    .header {
+      padding: 52px 20px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+
+    .header-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .header-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--green-dim);
+      border: 1.5px solid var(--green-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-icon i { font-size: 18px; color: var(--green); }
+
+    /* ======================================
+       CONTENT
+    ====================================== */
+    .content {
+      padding: 0 16px 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ======================================
+       CARD GANANCIA
+    ====================================== */
+    .card-ganancia {
+      background: var(--green-dim);
+      border: 1px solid var(--green-border);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 0 30px rgba(0,255,115,0.06);
+    }
+
+    .ganancia-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .ganancia-monto {
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--green);
+      letter-spacing: -2px;
+      margin-bottom: 16px;
+    }
+
+    .mini-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+
+    .mini-stat {
+      background: rgba(0,0,0,0.25);
+      border-radius: 12px;
+      padding: 10px 8px;
+      text-align: center;
+    }
+
+    .mini-stat-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: white;
+    }
+
+    .mini-stat-label {
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    /* ======================================
+       SECCIÓN VIAJES
+    ====================================== */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .ver-todos {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    /* ======================================
+       VIAJE ITEM
+    ====================================== */
+    .viaje-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .viaje-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .viaje-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .icon-completado { background: var(--green-dim); border: 1.5px solid var(--green-border); }
+    .icon-completado i { color: var(--green); font-size: 16px; }
+
+    .icon-rechazado { background: var(--gray-dim); border: 1.5px solid var(--gray-border); }
+    .icon-rechazado i { color: rgba(255,255,255,0.35); font-size: 16px; }
+
+    .icon-cancelado_usuario { background: rgba(255,140,0,0.08); border: 1.5px solid rgba(255,140,0,0.25); }
+    .icon-cancelado_usuario i { color: #ff8c00; font-size: 16px; }
+
+    .icon-cancelado_conductor { background: var(--red-dim); border: 1.5px solid var(--red-border); }
+    .icon-cancelado_conductor i { color: var(--red); font-size: 16px; }
+
+    .viaje-info { flex: 1; min-width: 0; }
+
+    .viaje-dinero {
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 2px;
+    }
+
+    .viaje-dinero.dim { color: rgba(255,255,255,0.45); }
+
+    .viaje-meta {
+      font-size: 11px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .viaje-right { text-align: right; flex-shrink: 0; }
+
+    .estado-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 8px;
+      margin-bottom: 4px;
+    }
+
+    .badge-completado { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
+    .badge-rechazado { background: var(--gray-dim); color: rgba(255,255,255,0.4); border: 1px solid var(--gray-border); }
+    .badge-cancelado_usuario { background: rgba(255,140,0,0.08); color: #ff8c00; border: 1px solid rgba(255,140,0,0.25); }
+    .badge-cancelado_conductor { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-border); }
+
+    .viaje-hora {
+      font-size: 10px;
+      color: rgba(255,255,255,0.25);
+    }
+
+    /* ======================================
+       VER HISTORIAL COMPLETO
+    ====================================== */
+    .btn-historial {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+    }
+
+    .btn-historial-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-historial-left i { font-size: 18px; color: var(--text-dim); }
+
+    .btn-historial-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .btn-historial-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .total-badge {
+      background: var(--green-dim);
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    /* ======================================
+       SKELETON LOADER
+    ====================================== */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 12px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ======================================
+       BOTTOM NAV
+    ====================================== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10,10,10,0.95);
+      border-top: 1px solid var(--border);
+      padding: 10px 0 24px;
+      display: flex;
+      justify-content: space-around;
+      backdrop-filter: blur(20px);
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      text-decoration: none;
+      padding: 4px 12px;
+    }
+
+    .nav-item i { font-size: 22px; color: var(--text-dim); }
+    .nav-item span { font-size: 10px; color: var(--text-dim); font-weight: 600; }
+    .nav-item.active i { color: var(--green); }
+    .nav-item.active span { color: var(--green); }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <p class="header-sub" id="fecha-hoy">Cargando...</p>
+      <p class="header-title">Hola, conductor 👋</p>
+    </div>
+    <div class="header-icon">
+      <i class="ti ti-user"></i>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- CARD GANANCIA -->
+    <div class="card-ganancia" id="card-ganancia">
+      <p class="ganancia-label">Ganancia hoy</p>
+      <p class="ganancia-monto" id="ganancia-monto">$0</p>
+      <div class="mini-stats">
+        <div class="mini-stat">
+          <p class="mini-stat-val" id="stat-viajes">—</p>
+          <p class="mini-stat-label">viajes</p>
+        </div>
+        <div class="mini-stat">
+          <p class="mini-stat-val" id="stat-score">—</p>
+          <p class="mini-stat-label">score prom</p>
+        </div>
+        <div class="mini-stat">
+          <p class="mini-stat-val" id="stat-km">—</p>
+          <p class="mini-stat-label">km hoy</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ÚLTIMOS VIAJES -->
+    <div class="section-header">
+      <p class="section-title">Últimos viajes</p>
+      <a class="ver-todos" href="/historial">
+        Ver todos <i class="ti ti-arrow-right" style="font-size:14px;"></i>
+      </a>
+    </div>
+
+    <div id="viajes-list">
+      <!-- skeleton -->
+      <div style="height:70px; margin-bottom:8px;" class="skeleton"></div>
+      <div style="height:70px; margin-bottom:8px;" class="skeleton"></div>
+      <div style="height:70px;" class="skeleton"></div>
+    </div>
+
+    <!-- VER HISTORIAL COMPLETO -->
+    <a class="btn-historial" href="/historial">
+      <div class="btn-historial-left">
+        <i class="ti ti-calendar"></i>
+        <span class="btn-historial-text">Ver historial completo</span>
+      </div>
+      <div class="btn-historial-right">
+        <span class="total-badge" id="total-badge">— viajes</span>
+        <i class="ti ti-chevron-right" style="font-size:16px; color:var(--text-dim);"></i>
+      </div>
+    </a>
+
+  </div>
+
+  <nav class="bottom-nav">
+    <a class="nav-item active" href="/inicio">
+      <i class="ti ti-home"></i>
+      <span>Inicio</span>
+    </a>
+    <a class="nav-item" href="/operativo">
+      <i class="ti ti-steering-wheel"></i>
+      <span>Operativo</span>
+    </a>
+    <a class="nav-item" href="/stats">
+      <i class="ti ti-chart-bar"></i>
+      <span>Stats</span>
+    </a>
+    <a class="nav-item" href="/historial">
+      <i class="ti ti-calendar"></i>
+      <span>Historial</span>
+    </a>
+    <a class="nav-item" href="/config">
+      <i class="ti ti-settings"></i>
+      <span>Config</span>
+    </a>
+  </nav>
+
+  <script>
+    // ==========================================
+    // FECHA HOY
+    // ==========================================
+    const dias = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+    const meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+    const hoy = new Date();
+    document.getElementById("fecha-hoy").textContent =
+      `${dias[hoy.getDay()]} ${hoy.getDate()} ${meses[hoy.getMonth()]}`;
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
+    function fmt(n) {
+      return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    function tiempoRelativo(fechaStr) {
+      const fecha = new Date(fechaStr.replace(" ", "T") + "-05:00");
+      const diff = Math.floor((Date.now() - fecha.getTime()) / 60000);
+      if (diff < 1) return "ahora";
+      if (diff < 60) return `hace ${diff}min`;
+      if (diff < 1440) return `hace ${Math.floor(diff/60)}hr`;
+      return `hace ${Math.floor(diff/1440)}d`;
+    }
+
+    function iconoEstado(estado) {
+      const map = {
+        completado: { cls: "icon-completado", icon: "ti-check" },
+        rechazado: { cls: "icon-rechazado", icon: "ti-ban" },
+        cancelado_usuario: { cls: "icon-cancelado_usuario", icon: "ti-user-x" },
+        cancelado_conductor: { cls: "icon-cancelado_conductor", icon: "ti-x" },
+      };
+      return map[estado] || { cls: "icon-rechazado", icon: "ti-ban" };
+    }
+
+    function labelEstado(estado) {
+      const map = {
+        completado: "Completado",
+        rechazado: "Rechazado",
+        cancelado_usuario: "Canc. usuario",
+        cancelado_conductor: "Canc. conductor",
+      };
+      return map[estado] || estado;
+    }
+
+    // ==========================================
+    // CARGAR DATOS
+    // ==========================================
+    async function cargarInicio() {
+      try {
+        const res = await fetch("/api/inicio");
+        const data = await res.json();
+        const { stats, ultimos_viajes } = data;
+
+        // Stats
+        document.getElementById("ganancia-monto").textContent = `$${fmt(stats.ganancia)}`;
+        document.getElementById("stat-viajes").textContent = stats.viajes;
+        document.getElementById("stat-score").textContent = stats.score_prom || "—";
+        document.getElementById("stat-km").textContent = stats.km_total ? `${stats.km_total}km` : "—";
+        document.getElementById("total-badge").textContent = `${stats.total_db} viajes`;
+
+        // Últimos viajes
+        const lista = document.getElementById("viajes-list");
+
+        if (ultimos_viajes.length === 0) {
+          lista.innerHTML = `
+            <div style="text-align:center; padding:30px; color:var(--text-dim); font-size:14px;">
+              Sin viajes hoy
+            </div>`;
+          return;
+        }
+
+        lista.innerHTML = ultimos_viajes.map(v => {
+          const { cls, icon } = iconoEstado(v.estado);
+          const esCompletado = v.estado === "completado";
+          return `
+          <div class="viaje-item">
+            <div class="viaje-left">
+              <div class="viaje-icon ${cls}">
+                <i class="ti ${icon}"></i>
+              </div>
+              <div class="viaje-info">
+                <p class="viaje-dinero ${esCompletado ? '' : 'dim'}">$${fmt(v.dinero)}</p>
+                <p class="viaje-meta">${v.distancia_total}km · ${v.tiempo_total}min${esCompletado ? ` · $${fmt(v.dinero / v.distancia_total)}/km` : ''}</p>
+              </div>
+            </div>
+            <div class="viaje-right">
+              <div class="estado-badge badge-${v.estado}">${labelEstado(v.estado)}</div>
+              <p class="viaje-hora">${tiempoRelativo(v.fecha)}</p>
+            </div>
+          </div>`;
+        }).join("");
+
+      } catch (e) {
+        console.error("Error cargando inicio:", e);
+      }
+    }
+
+    cargarInicio();
+
+    // Recargar al volver a la app
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") cargarInicio();
+    });
+
+    // Service Worker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js");
+    }
+  </script>
+
+</body>
+</html>
