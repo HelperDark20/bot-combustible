@@ -67,6 +67,7 @@ def procesar_y_notificar(data, viaje_id, resultado_score):
     try:
         nuevo_viaje = {
             "id": viaje_id,
+            "tipo_viaje": data.get("tipo_viaje", "Economy"),
             "ganancia": float(data["dinero"]),
             "distancia_recogida_km": float(data.get("distancia_recogida_km", 0)),
             "distancia_destino_km": float(data.get("distancia_destino_km", 0)),

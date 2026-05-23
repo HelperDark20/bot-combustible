@@ -401,8 +401,12 @@
             <span>⏱ ${v.tiempo_total}min</span>
             <span>💵 ${fmt(v.dinero_por_km)}/km</span>
             <span>💰 ${fmt(v.dinero_por_hora)}/hr</span>
+            <span>💸 ${fmt(v.dinero_por_min)}/min</span>
           </div>
-          <div class="score-badge ${sc}">⭐ ${v.score_visual}/10 · ${v.estado_score}</div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+            <div class="score-badge ${sc}">⭐ ${v.score_visual}/10 · ${v.estado_score}</div>
+            ${v.tipo_viaje ? `<div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:3px 10px; font-size:12px; font-weight:700; color:rgba(255,255,255,0.6);">${v.tipo_viaje}</div>` : ""}
+          </div>
           <div class="btn-row btn-row-2">
             <a href="/web/aceptar" class="btn btn-green">
               <i class="ti ti-check" style="font-size:16px;"></i> Aceptar
