@@ -135,6 +135,22 @@ def procesar_imagen(ruta):
         respuesta_gpt = analizar_imagen_openai(ruta)
         respuesta_gpt = respuesta_gpt.replace("```json", "").replace("```", "").strip()
         data = json.loads(respuesta_gpt)
+
+        # Normalizar tipo_viaje
+        tipo_raw = data.get("tipo_viaje", "").lower()
+        if "economy" in tipo_raw:
+            data["tipo_viaje"] = "Economy"
+        elif "comfort" in tipo_raw or "confort" in tipo_raw:
+            data["tipo_viaje"] = "Comfort"
+        elif "priority" in tipo_raw:
+            data["tipo_viaje"] = "Priority"
+        elif "xl" in tipo_raw:
+            data["tipo_viaje"] = "UberXL"
+        elif "black" in tipo_raw:
+            data["tipo_viaje"] = "Black"
+        else:
+            data["tipo_viaje"] = "Economy"
+
         viaje_id = guardar_viaje(data)
         resultado_score = construir_respuesta(data)
         procesar_y_notificar(data, viaje_id, resultado_score)
@@ -174,6 +190,22 @@ Texto de Uber Driver:
         contenido = respuesta.choices[0].message.content
         contenido = contenido.replace("```json", "").replace("```", "").strip()
         data = json.loads(contenido)
+
+        # Normalizar tipo_viaje
+        tipo_raw = data.get("tipo_viaje", "").lower()
+        if "economy" in tipo_raw:
+            data["tipo_viaje"] = "Economy"
+        elif "comfort" in tipo_raw or "confort" in tipo_raw:
+            data["tipo_viaje"] = "Comfort"
+        elif "priority" in tipo_raw:
+            data["tipo_viaje"] = "Priority"
+        elif "xl" in tipo_raw:
+            data["tipo_viaje"] = "UberXL"
+        elif "black" in tipo_raw:
+            data["tipo_viaje"] = "Black"
+        else:
+            data["tipo_viaje"] = "Economy"
+
         viaje_id = guardar_viaje(data)
         resultado_score = construir_respuesta(data)
         procesar_y_notificar(data, viaje_id, resultado_score)

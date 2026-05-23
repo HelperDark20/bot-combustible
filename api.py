@@ -542,6 +542,19 @@ def registrar_api(app):
             return jsonify({"error": str(e)}), 500
 
     # ==========================================
+    # API — BORRAR HISTORIAL COMPLETO
+    # ==========================================
+    @app.route("/api/borrar-historial", methods=["POST"])
+    def api_borrar_historial():
+        with state.STATE_LOCK:
+            cursor.execute("DELETE FROM viajes")
+            conn.commit()
+            state.viaje_nuevo = None
+            state.viaje_en_curso = None
+            state.viaje_pendiente = None
+        return jsonify({"success": True})
+
+    # ==========================================
     # API — REINICIAR DÍA
     # ==========================================
     @app.route("/api/reiniciar-dia", methods=["POST"])

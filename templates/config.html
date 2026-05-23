@@ -416,6 +416,11 @@
       <span>Reiniciar día</span>
     </button>
 
+    <button class="btn-reiniciar" onclick="confirmarBorrarHistorial()" style="margin-top:0;">
+      <i class="ti ti-database-off" style="font-size:18px; color:var(--red);"></i>
+      <span>Borrar historial completo</span>
+    </button>
+
   </div>
 
   <!-- SHEET EDITAR -->
@@ -446,6 +451,30 @@
           <i class="ti ti-check" style="font-size:18px;"></i>
           Guardar
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHEET CONFIRMAR BORRAR HISTORIAL -->
+  <div class="overlay" id="overlay-historial" onclick="cerrarBorrarHistorial(event)">
+    <div class="sheet" id="sheet-historial">
+      <div class="sheet-handle"><div class="sheet-handle-bar"></div></div>
+      <div class="sheet-inner">
+        <div style="text-align:center; padding:8px 0 20px;">
+          <div style="width:56px; height:56px; border-radius:50%; background:var(--red-dim); border:1.5px solid var(--red-border); display:flex; align-items:center; justify-content:center; margin:0 auto 14px;">
+            <i class="ti ti-database-off" style="font-size:24px; color:var(--red);"></i>
+          </div>
+          <p style="font-size:18px; font-weight:800; color:var(--text); margin-bottom:8px;">Borrar historial completo</p>
+          <p style="font-size:14px; color:var(--text-dim); line-height:1.5;">Se borrarán TODOS los viajes registrados. Esta acción no se puede deshacer.</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <button onclick="ejecutarBorrarHistorial()" style="width:100%; height:52px; background:var(--red-dim); border:1px solid var(--red-border); border-radius:14px; font-size:15px; font-weight:800; color:var(--red); cursor:pointer; font-family:'Space Grotesk',sans-serif;">
+            Sí, borrar todo
+          </button>
+          <button onclick="cerrarBorrarHistorial()" style="width:100%; height:52px; background:var(--card); border:1px solid var(--border); border-radius:14px; font-size:15px; font-weight:700; color:var(--text-dim); cursor:pointer; font-family:'Space Grotesk',sans-serif;">
+            Cancelar
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -569,6 +598,25 @@
         cargarConfig();
       } catch(e) {
         console.error("Error guardando:", e);
+      }
+    }
+
+    function confirmarBorrarHistorial() {
+      document.getElementById("overlay-historial").classList.add("visible");
+    }
+
+    function cerrarBorrarHistorial(e) {
+      if (e && e.target !== document.getElementById("overlay-historial")) return;
+      document.getElementById("overlay-historial").classList.remove("visible");
+    }
+
+    async function ejecutarBorrarHistorial() {
+      try {
+        await fetch("/api/borrar-historial", { method: "POST" });
+        document.getElementById("overlay-historial").classList.remove("visible");
+        cargarConfig();
+      } catch(e) {
+        console.error("Error borrando historial:", e);
       }
     }
 
