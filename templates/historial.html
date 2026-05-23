@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="apple-touch-icon" href="/static/icon-192.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>IA Viajes — Historial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --green: #00ff73;
+      --green-dim: rgba(0,255,115,0.12);
+      --green-border: rgba(0,255,115,0.25);
+      --red: #ff4444;
+      --red-dim: rgba(255,60,60,0.12);
+      --red-border: rgba(255,60,60,0.25);
+      --yellow: #ffb400;
+      --yellow-dim: rgba(255,180,0,0.1);
+      --yellow-border: rgba(255,180,0,0.25);
+      --gray-dim: rgba(150,150,150,0.1);
+      --gray-border: rgba(150,150,150,0.2);
+      --orange-dim: rgba(255,140,0,0.08);
+      --orange-border: rgba(255,140,0,0.25);
+      --bg: #0a0a0a;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.07);
+      --text: white;
+      --text-dim: rgba(255,255,255,0.4);
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+    }
+
+    .header {
+      padding: 52px 20px 16px;
+    }
+
+    .header-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+
+    .header-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .tabs {
+      padding: 0 16px 16px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .tab.active {
+      background: var(--green);
+      border-color: var(--green);
+      color: #000;
+    }
+
+    .content {
+      padding: 0 16px 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .fecha-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 8px 0 4px;
+    }
+
+    .viaje-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .viaje-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .viaje-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .icon-completado { background: var(--green-dim); border: 1.5px solid var(--green-border); }
+    .icon-completado i { color: var(--green); font-size: 16px; }
+    .icon-rechazado { background: var(--gray-dim); border: 1.5px solid var(--gray-border); }
+    .icon-rechazado i { color: rgba(255,255,255,0.35); font-size: 16px; }
+    .icon-cancelado_usuario { background: var(--orange-dim); border: 1.5px solid var(--orange-border); }
+    .icon-cancelado_usuario i { color: #ff8c00; font-size: 16px; }
+    .icon-cancelado_conductor { background: var(--red-dim); border: 1.5px solid var(--red-border); }
+    .icon-cancelado_conductor i { color: var(--red); font-size: 16px; }
+    .icon-nuevo { background: var(--gray-dim); border: 1.5px solid var(--gray-border); }
+    .icon-nuevo i { color: rgba(255,255,255,0.35); font-size: 16px; }
+
+    .viaje-info { flex: 1; min-width: 0; }
+
+    .viaje-dinero {
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 2px;
+    }
+
+    .viaje-dinero.dim { color: rgba(255,255,255,0.4); }
+
+    .viaje-meta {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .viaje-right { text-align: right; flex-shrink: 0; }
+
+    .estado-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 8px;
+      margin-bottom: 4px;
+    }
+
+    .badge-completado { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
+    .badge-rechazado { background: var(--gray-dim); color: rgba(255,255,255,0.4); border: 1px solid var(--gray-border); }
+    .badge-cancelado_usuario { background: var(--orange-dim); color: #ff8c00; border: 1px solid var(--orange-border); }
+    .badge-cancelado_conductor { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-border); }
+    .badge-nuevo { background: var(--gray-dim); color: rgba(255,255,255,0.4); border: 1px solid var(--gray-border); }
+
+    .viaje-hora { font-size: 10px; color: rgba(255,255,255,0.25); }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+      gap: 12px;
+    }
+
+    .empty-icon { font-size: 48px; opacity: 0.2; }
+    .empty-text { font-size: 16px; color: var(--text-dim); font-weight: 600; }
+
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 16px;
+      height: 70px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10,10,10,0.95);
+      border-top: 1px solid var(--border);
+      padding: 10px 0 24px;
+      display: flex;
+      justify-content: space-around;
+      backdrop-filter: blur(20px);
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      text-decoration: none;
+      padding: 4px 12px;
+    }
+
+    .nav-item i { font-size: 22px; color: var(--text-dim); }
+    .nav-item span { font-size: 10px; color: var(--text-dim); font-weight: 600; }
+    .nav-item.active i { color: var(--green); }
+    .nav-item.active span { color: var(--green); }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <p class="header-sub" id="header-sub">Cargando...</p>
+    <p class="header-title">Historial</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="cambiarTab('todos', this)">Todos</button>
+    <button class="tab" onclick="cambiarTab('hoy', this)">Hoy</button>
+    <button class="tab" onclick="cambiarTab('semana', this)">Semana</button>
+    <button class="tab" onclick="cambiarTab('mes', this)">Mes</button>
+  </div>
+
+  <div class="content" id="content">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a class="nav-item" href="/inicio">
+      <i class="ti ti-home"></i>
+      <span>Inicio</span>
+    </a>
+    <a class="nav-item" href="/operativo">
+      <i class="ti ti-steering-wheel"></i>
+      <span>Operativo</span>
+    </a>
+    <a class="nav-item" href="/stats">
+      <i class="ti ti-chart-bar"></i>
+      <span>Stats</span>
+    </a>
+    <a class="nav-item active" href="/historial">
+      <i class="ti ti-calendar"></i>
+      <span>Historial</span>
+    </a>
+    <a class="nav-item" href="/config">
+      <i class="ti ti-settings"></i>
+      <span>Config</span>
+    </a>
+  </nav>
+
+  <script>
+    const dias = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+    const meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+    function fmt(n) {
+      return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    function formatFecha(fechaStr) {
+      const f = new Date(fechaStr.replace(" ", "T") + "-05:00");
+      const hoy = new Date();
+      const ayer = new Date(); ayer.setDate(ayer.getDate() - 1);
+      if (f.toDateString() === hoy.toDateString()) return "Hoy";
+      if (f.toDateString() === ayer.toDateString()) return "Ayer";
+      return `${dias[f.getDay()]} ${f.getDate()} ${meses[f.getMonth()]}`;
+    }
+
+    function formatHora(fechaStr) {
+      const f = new Date(fechaStr.replace(" ", "T") + "-05:00");
+      return f.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function iconoEstado(estado) {
+      const map = {
+        completado: { cls: "icon-completado", icon: "ti-check" },
+        rechazado: { cls: "icon-rechazado", icon: "ti-ban" },
+        cancelado_usuario: { cls: "icon-cancelado_usuario", icon: "ti-user-x" },
+        cancelado_conductor: { cls: "icon-cancelado_conductor", icon: "ti-x" },
+        nuevo: { cls: "icon-nuevo", icon: "ti-clock" },
+      };
+      return map[estado] || { cls: "icon-rechazado", icon: "ti-ban" };
+    }
+
+    function labelEstado(estado) {
+      const map = {
+        completado: "Completado",
+        rechazado: "Rechazado",
+        cancelado_usuario: "Canc. usuario",
+        cancelado_conductor: "Canc. conductor",
+        nuevo: "Sin acción",
+      };
+      return map[estado] || estado;
+    }
+
+    function filtrarViajes(viajes, tab) {
+      const ahora = new Date();
+      return viajes.filter(v => {
+        const f = new Date(v.fecha.replace(" ", "T") + "-05:00");
+        if (tab === "hoy") {
+          return f.toDateString() === ahora.toDateString();
+        } else if (tab === "semana") {
+          const semanaAtras = new Date(); semanaAtras.setDate(ahora.getDate() - 7);
+          return f >= semanaAtras;
+        } else if (tab === "mes") {
+          return f.getMonth() === ahora.getMonth() && f.getFullYear() === ahora.getFullYear();
+        }
+        return true;
+      });
+    }
+
+    let todosLosViajes = [];
+    let tabActual = "todos";
+
+    function renderViajes(viajes) {
+      const content = document.getElementById("content");
+      document.getElementById("header-sub").textContent = `${viajes.length} viaje${viajes.length !== 1 ? "s" : ""}`;
+
+      if (viajes.length === 0) {
+        content.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🚖</div>
+            <p class="empty-text">Sin viajes en este período</p>
+          </div>`;
+        return;
+      }
+
+      // Agrupar por fecha
+      const grupos = {};
+      viajes.forEach(v => {
+        const key = formatFecha(v.fecha);
+        if (!grupos[key]) grupos[key] = [];
+        grupos[key].push(v);
+      });
+
+      let html = "";
+      for (const [fecha, lista] of Object.entries(grupos)) {
+        html += `<p class="fecha-label">${fecha}</p>`;
+        lista.forEach(v => {
+          const { cls, icon } = iconoEstado(v.estado);
+          const esCompletado = v.estado === "completado";
+          const meta = esCompletado
+            ? `${v.distancia_total}km · ${v.tiempo_total}min · $${fmt(v.dinero / v.distancia_total)}/km`
+            : `${v.distancia_total}km · ${v.tiempo_total}min`;
+
+          html += `
+          <div class="viaje-item">
+            <div class="viaje-left">
+              <div class="viaje-icon ${cls}">
+                <i class="ti ${icon}"></i>
+              </div>
+              <div class="viaje-info">
+                <p class="viaje-dinero ${esCompletado ? '' : 'dim'}">$${fmt(v.dinero)}</p>
+                <p class="viaje-meta">${meta}</p>
+              </div>
+            </div>
+            <div class="viaje-right">
+              <div class="estado-badge badge-${v.estado}">${labelEstado(v.estado)}</div>
+              <p class="viaje-hora">${formatHora(v.fecha)}</p>
+            </div>
+          </div>`;
+        });
+      }
+
+      content.innerHTML = html;
+    }
+
+    async function cargarHistorial() {
+      try {
+        const res = await fetch("/api/historial");
+        todosLosViajes = await res.json();
+        renderViajes(filtrarViajes(todosLosViajes, tabActual));
+      } catch(e) {
+        console.error("Error cargando historial:", e);
+      }
+    }
+
+    function cambiarTab(tab, btn) {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+      tabActual = tab;
+      renderViajes(filtrarViajes(todosLosViajes, tab));
+    }
+
+    cargarHistorial();
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") cargarHistorial();
+    });
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js");
+    }
+  </script>
+
+</body>
+</html>

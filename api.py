@@ -459,6 +459,13 @@ def registrar_api(app):
             })
 
     # ==========================================
+    # HISTORIAL — página
+    # ==========================================
+    @app.route("/historial")
+    def historial():
+        return render_template("historial.html")
+
+    # ==========================================
     # API — HISTORIAL (últimos 50)
     # ==========================================
     @app.route("/api/historial")
