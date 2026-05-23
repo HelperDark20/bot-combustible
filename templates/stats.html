@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="apple-touch-icon" href="/static/icon-192.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>IA Viajes — Stats</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --green: #00ff73;
+      --green-dim: rgba(0,255,115,0.12);
+      --green-border: rgba(0,255,115,0.25);
+      --red: #ff4444;
+      --red-dim: rgba(255,60,60,0.12);
+      --red-border: rgba(255,60,60,0.25);
+      --yellow: #ffb400;
+      --yellow-dim: rgba(255,180,0,0.1);
+      --yellow-border: rgba(255,180,0,0.25);
+      --bg: #0a0a0a;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.07);
+      --text: white;
+      --text-dim: rgba(255,255,255,0.4);
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+    }
+
+    .header {
+      padding: 52px 20px 16px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .header-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+
+    .header-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .tabs {
+      padding: 0 16px 16px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .tab.active {
+      background: var(--green);
+      border-color: var(--green);
+      color: #000;
+    }
+
+    .content {
+      padding: 0 16px 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-ganancia {
+      background: var(--green-dim);
+      border: 1px solid var(--green-border);
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .ganancia-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    .ganancia-monto {
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--green);
+      letter-spacing: -2px;
+      margin-bottom: 4px;
+    }
+
+    .ganancia-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .card-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .card-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .card-val span {
+      font-size: 14px;
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+
+    .card-hint {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .card-hint.green { color: var(--green); }
+    .card-hint.red { color: var(--red); }
+
+    .desglose {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .desglose-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+    }
+
+    .desglose-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .desglose-row:last-child { border-bottom: none; }
+
+    .desglose-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .desglose-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .desglose-val {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 12px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10,10,10,0.95);
+      border-top: 1px solid var(--border);
+      padding: 10px 0 24px;
+      display: flex;
+      justify-content: space-around;
+      backdrop-filter: blur(20px);
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      text-decoration: none;
+      padding: 4px 12px;
+    }
+
+    .nav-item i { font-size: 22px; color: var(--text-dim); }
+    .nav-item span { font-size: 10px; color: var(--text-dim); font-weight: 600; }
+    .nav-item.active i { color: var(--green); }
+    .nav-item.active span { color: var(--green); }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <p class="header-sub">Tu rendimiento</p>
+      <p class="header-title">Estadísticas</p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="cambiarTab('hoy', this)">Hoy</button>
+    <button class="tab" onclick="cambiarTab('semana', this)">Semana</button>
+    <button class="tab" onclick="cambiarTab('mes', this)">Mes</button>
+    <button class="tab" onclick="cambiarTab('total', this)">Total</button>
+  </div>
+
+  <div class="content" id="content">
+    <div style="height:120px;" class="skeleton"></div>
+    <div class="grid-2">
+      <div style="height:90px;" class="skeleton"></div>
+      <div style="height:90px;" class="skeleton"></div>
+    </div>
+    <div class="grid-2">
+      <div style="height:90px;" class="skeleton"></div>
+      <div style="height:90px;" class="skeleton"></div>
+    </div>
+    <div style="height:160px;" class="skeleton"></div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a class="nav-item" href="/inicio">
+      <i class="ti ti-home"></i>
+      <span>Inicio</span>
+    </a>
+    <a class="nav-item" href="/operativo">
+      <i class="ti ti-steering-wheel"></i>
+      <span>Operativo</span>
+    </a>
+    <a class="nav-item active" href="/stats">
+      <i class="ti ti-chart-bar"></i>
+      <span>Stats</span>
+    </a>
+    <a class="nav-item" href="/config">
+      <i class="ti ti-settings"></i>
+      <span>Config</span>
+    </a>
+  </nav>
+
+  <script>
+    function fmt(n) {
+      return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    function scoreColor(s) {
+      if (s >= 8) return "green";
+      if (s >= 5) return "";
+      return "red";
+    }
+
+    function scoreLabel(s) {
+      if (s >= 8) return "Buen rendimiento";
+      if (s >= 5) return "Rendimiento regular";
+      return "Rendimiento bajo";
+    }
+
+    let tabActual = "hoy";
+
+    async function cargarStats(periodo) {
+      const content = document.getElementById("content");
+      content.innerHTML = `
+        <div style="height:120px;" class="skeleton"></div>
+        <div class="grid-2">
+          <div style="height:90px;" class="skeleton"></div>
+          <div style="height:90px;" class="skeleton"></div>
+        </div>
+        <div class="grid-2">
+          <div style="height:90px;" class="skeleton"></div>
+          <div style="height:90px;" class="skeleton"></div>
+        </div>
+        <div style="height:160px;" class="skeleton"></div>`;
+
+      try {
+        const res = await fetch(`/api/stats/${periodo}`);
+        const d = await res.json();
+
+        const neta = d.ganancia - (d.km_total * 466);
+        const sc = d.score_prom || 0;
+
+        content.innerHTML = `
+          <div class="card-ganancia">
+            <p class="ganancia-label">Ganancia bruta</p>
+            <p class="ganancia-monto">$${fmt(d.ganancia)}</p>
+            <p class="ganancia-sub">${d.completados} viaje${d.completados !== 1 ? "s" : ""} completado${d.completados !== 1 ? "s" : ""}</p>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <p class="card-label">Ganancia neta</p>
+              <p class="card-val">$${fmt(neta)}</p>
+              <p class="card-hint">desc. combustible</p>
+            </div>
+            <div class="card">
+              <p class="card-label">Score promedio</p>
+              <p class="card-val">${sc}<span>/10</span></p>
+              <p class="card-hint ${scoreColor(sc)}">${scoreLabel(sc)}</p>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <p class="card-label">KM recorridos</p>
+              <p class="card-val">${d.km_total}<span>km</span></p>
+              <p class="card-hint">completados</p>
+            </div>
+            <div class="card">
+              <p class="card-label">Gasto combustible</p>
+              <p class="card-val">$${fmt(d.km_total * 466)}</p>
+              <p class="card-hint red">estimado</p>
+            </div>
+          </div>
+
+          <div class="desglose">
+            <p class="desglose-title">Desglose de viajes</p>
+            <div class="desglose-row">
+              <div class="desglose-left">
+                <div class="dot" style="background:#00ff73;"></div>
+                <span class="desglose-label">Completados</span>
+              </div>
+              <span class="desglose-val">${d.completados}</span>
+            </div>
+            <div class="desglose-row">
+              <div class="desglose-left">
+                <div class="dot" style="background:#ff4444;"></div>
+                <span class="desglose-label">Cancelados</span>
+              </div>
+              <span class="desglose-val">${d.cancelados}</span>
+            </div>
+            <div class="desglose-row">
+              <div class="desglose-left">
+                <div class="dot" style="background:rgba(150,150,150,0.5);"></div>
+                <span class="desglose-label">Rechazados</span>
+              </div>
+              <span class="desglose-val">${d.total - d.completados - d.cancelados}</span>
+            </div>
+            <div class="desglose-row">
+              <div class="desglose-left">
+                <div class="dot" style="background:rgba(255,255,255,0.2);"></div>
+                <span class="desglose-label">Total</span>
+              </div>
+              <span class="desglose-val">${d.total}</span>
+            </div>
+          </div>`;
+
+      } catch (e) {
+        console.error("Error cargando stats:", e);
+      }
+    }
+
+    function cambiarTab(periodo, btn) {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+      tabActual = periodo;
+      cargarStats(periodo);
+    }
+
+    cargarStats("hoy");
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") cargarStats(tabActual);
+    });
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js");
+    }
+  </script>
+
+</body>
+</html>

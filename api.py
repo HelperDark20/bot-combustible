@@ -92,6 +92,13 @@ def registrar_api(app):
             })
 
     # ==========================================
+    # STATS
+    # ==========================================
+    @app.route("/stats")
+    def stats():
+        return render_template("stats.html")
+
+    # ==========================================
     # OPERATIVO
     # ==========================================
     @app.route("/operativo")
