@@ -75,7 +75,7 @@ def registrar_api(app):
             rows = cursor.fetchall()
             ultimos = [{
                 "id": r[0], "fecha": r[1], "dinero": r[2],
-                "distancia_total": r[3], "tiempo_total": r[4],
+                "distancia_total": round(r[3] or 0, 2), "tiempo_total": r[4],
                 "score_visual": r[5], "estado": r[6], "motivo_cancelacion": r[7]
             } for r in rows]
 
@@ -486,7 +486,7 @@ def registrar_api(app):
                     "fecha": r[1],
                     "tipo_viaje": r[2],
                     "dinero": r[3],
-                    "distancia_total": r[4],
+                    "distancia_total": round(r[4] or 0, 2),
                     "tiempo_total": r[5],
                     "score_visual": r[6],
                     "estado": r[7],

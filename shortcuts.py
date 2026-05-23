@@ -70,7 +70,7 @@ def procesar_y_notificar(data, viaje_id, resultado_score):
             "ganancia": float(data["dinero"]),
             "distancia_recogida_km": float(data.get("distancia_recogida_km", 0)),
             "distancia_destino_km": float(data.get("distancia_destino_km", 0)),
-            "distancia_total": resultado_score["distancia_total"],
+            "distancia_total": round(float(resultado_score["distancia_total"]), 2),
             "tiempo_total": resultado_score["tiempo_total"],
             "dinero_por_km": resultado_score["dinero_por_km"],
             "dinero_por_min": resultado_score["dinero_por_min"],
