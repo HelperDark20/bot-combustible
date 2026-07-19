@@ -76,6 +76,19 @@
     .card-title { font-size: 15px; font-weight: 800; color: var(--text); }
     .card-desc { font-size: 12px; color: var(--text-dim); }
 
+    .subsection-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 14px 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .subsection-label i { font-size: 12px; }
+
     .field { margin-bottom: 10px; }
     .field-label {
       font-size: 11px; font-weight: 700; color: var(--text-dim);
@@ -203,7 +216,7 @@
 <body>
 
   <div class="header">
-    <p class="header-sub">Herramientas</p>
+    <p class="header-sub">Herramientas · Sin configuración previa</p>
     <p class="header-title">Calculadora</p>
   </div>
 
@@ -225,7 +238,25 @@
         <label class="field-label">Monto a tanquear</label>
         <div class="input-wrap">
           <span class="input-prefix">$</span>
-          <input class="input-field" type="number" inputmode="decimal" id="monto-tanqueada" placeholder="20000">
+          <input class="input-field" type="number" inputmode="decimal" id="t-monto" placeholder="20000">
+        </div>
+      </div>
+
+      <p class="subsection-label"><i class="ti ti-droplet"></i> Datos de tu combustible</p>
+
+      <div class="row-2">
+        <div class="field">
+          <label class="field-label">KM por litro</label>
+          <div class="input-wrap">
+            <input class="input-field" type="number" inputmode="decimal" id="t-kml" placeholder="12">
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Valor galón</label>
+          <div class="input-wrap">
+            <span class="input-prefix">$</span>
+            <input class="input-field" type="number" inputmode="decimal" id="t-galon" placeholder="15880">
+          </div>
         </div>
       </div>
 
@@ -233,7 +264,7 @@
         <i class="ti ti-calculator" style="font-size:16px;"></i> Calcular
       </button>
 
-      <p class="error-msg" id="error-tanqueada">Ingresa un monto válido</p>
+      <p class="error-msg" id="error-tanqueada">Completa todos los campos</p>
 
       <div class="resultado" id="resultado-tanqueada">
         <p class="resultado-main" id="km-posibles">0 km</p>
@@ -263,13 +294,13 @@
           <label class="field-label">Ganancia</label>
           <div class="input-wrap">
             <span class="input-prefix">$</span>
-            <input class="input-field" type="number" inputmode="decimal" id="eval-ganancia" placeholder="12000">
+            <input class="input-field" type="number" inputmode="decimal" id="e-ganancia" placeholder="12000">
           </div>
         </div>
         <div class="field">
           <label class="field-label">Distancia</label>
           <div class="input-wrap">
-            <input class="input-field" type="number" inputmode="decimal" id="eval-distancia" placeholder="8">
+            <input class="input-field" type="number" inputmode="decimal" id="e-distancia" placeholder="8">
             <span class="input-prefix">km</span>
           </div>
         </div>
@@ -278,8 +309,26 @@
       <div class="field">
         <label class="field-label">Tiempo total (opcional)</label>
         <div class="input-wrap">
-          <input class="input-field" type="number" inputmode="decimal" id="eval-tiempo" placeholder="15">
+          <input class="input-field" type="number" inputmode="decimal" id="e-tiempo" placeholder="15">
           <span class="input-prefix">min</span>
+        </div>
+      </div>
+
+      <p class="subsection-label"><i class="ti ti-droplet"></i> Datos de tu combustible</p>
+
+      <div class="row-2">
+        <div class="field">
+          <label class="field-label">KM por litro</label>
+          <div class="input-wrap">
+            <input class="input-field" type="number" inputmode="decimal" id="e-kml" placeholder="12">
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Valor galón</label>
+          <div class="input-wrap">
+            <span class="input-prefix">$</span>
+            <input class="input-field" type="number" inputmode="decimal" id="e-galon" placeholder="15880">
+          </div>
         </div>
       </div>
 
@@ -287,7 +336,7 @@
         <i class="ti ti-calculator" style="font-size:16px;"></i> Evaluar
       </button>
 
-      <p class="error-msg" id="error-evaluar">Completa ganancia y distancia</p>
+      <p class="error-msg" id="error-evaluar">Completa todos los campos</p>
 
       <div class="resultado" id="resultado-evaluar">
         <p class="resultado-main" id="eval-neta">$0</p>
@@ -329,7 +378,25 @@
         <label class="field-label">Meta de ganancia neta</label>
         <div class="input-wrap">
           <span class="input-prefix">$</span>
-          <input class="input-field" type="number" inputmode="decimal" id="meta-monto" placeholder="100000">
+          <input class="input-field" type="number" inputmode="decimal" id="m-meta" placeholder="100000">
+        </div>
+      </div>
+
+      <p class="subsection-label"><i class="ti ti-droplet"></i> Datos de tu combustible</p>
+
+      <div class="row-2">
+        <div class="field">
+          <label class="field-label">KM por litro</label>
+          <div class="input-wrap">
+            <input class="input-field" type="number" inputmode="decimal" id="m-kml" placeholder="12">
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Valor galón</label>
+          <div class="input-wrap">
+            <span class="input-prefix">$</span>
+            <input class="input-field" type="number" inputmode="decimal" id="m-galon" placeholder="15880">
+          </div>
         </div>
       </div>
 
@@ -337,7 +404,7 @@
         <i class="ti ti-target-arrow" style="font-size:16px;"></i> Calcular meta
       </button>
 
-      <p class="error-msg" id="error-meta">Ingresa una meta válida</p>
+      <p class="error-msg" id="error-meta">Completa todos los campos</p>
 
       <div class="resultado" id="resultado-meta">
         <p class="resultado-main" id="meta-restante">$0 restantes</p>
@@ -393,11 +460,13 @@
     // CARD 1 — TANQUEADA
     // ==========================================
     async function calcularTanqueada() {
-      const monto = parseFloat(document.getElementById("monto-tanqueada").value);
+      const monto = parseFloat(document.getElementById("t-monto").value);
+      const km_l = parseFloat(document.getElementById("t-kml").value);
+      const valor_galon = parseFloat(document.getElementById("t-galon").value);
       const err = document.getElementById("error-tanqueada");
       const res = document.getElementById("resultado-tanqueada");
 
-      if (!monto || monto <= 0) {
+      if (!monto || monto <= 0 || !km_l || km_l <= 0 || !valor_galon || valor_galon <= 0) {
         err.classList.add("visible");
         res.classList.remove("visible");
         return;
@@ -408,7 +477,7 @@
         const r = await fetch("/api/calculadora/tanqueada", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ monto })
+          body: JSON.stringify({ monto, km_l, valor_galon })
         });
         const data = await r.json();
         if (data.error) { err.textContent = data.error; err.classList.add("visible"); return; }
@@ -425,13 +494,15 @@
     // CARD 2 — EVALUAR VIAJE
     // ==========================================
     async function calcularEvaluar() {
-      const ganancia = parseFloat(document.getElementById("eval-ganancia").value);
-      const distancia_total = parseFloat(document.getElementById("eval-distancia").value);
-      const tiempo_total = parseFloat(document.getElementById("eval-tiempo").value) || 0;
+      const ganancia = parseFloat(document.getElementById("e-ganancia").value);
+      const distancia_total = parseFloat(document.getElementById("e-distancia").value);
+      const tiempo_total = parseFloat(document.getElementById("e-tiempo").value) || 0;
+      const km_l = parseFloat(document.getElementById("e-kml").value);
+      const valor_galon = parseFloat(document.getElementById("e-galon").value);
       const err = document.getElementById("error-evaluar");
       const res = document.getElementById("resultado-evaluar");
 
-      if (!ganancia || ganancia <= 0 || !distancia_total || distancia_total <= 0) {
+      if (!ganancia || ganancia <= 0 || !distancia_total || distancia_total <= 0 || !km_l || km_l <= 0 || !valor_galon || valor_galon <= 0) {
         err.classList.add("visible");
         res.classList.remove("visible");
         return;
@@ -442,7 +513,7 @@
         const r = await fetch("/api/calculadora/evaluar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ganancia, distancia_total, tiempo_total })
+          body: JSON.stringify({ ganancia, distancia_total, tiempo_total, km_l, valor_galon })
         });
         const data = await r.json();
         if (data.error) { err.textContent = data.error; err.classList.add("visible"); return; }
@@ -467,11 +538,13 @@
     // CARD 3 — META DEL DÍA
     // ==========================================
     async function calcularMeta() {
-      const meta = parseFloat(document.getElementById("meta-monto").value);
+      const meta = parseFloat(document.getElementById("m-meta").value);
+      const km_l = parseFloat(document.getElementById("m-kml").value);
+      const valor_galon = parseFloat(document.getElementById("m-galon").value);
       const err = document.getElementById("error-meta");
       const res = document.getElementById("resultado-meta");
 
-      if (!meta || meta <= 0) {
+      if (!meta || meta <= 0 || !km_l || km_l <= 0 || !valor_galon || valor_galon <= 0) {
         err.classList.add("visible");
         res.classList.remove("visible");
         return;
@@ -479,32 +552,27 @@
       err.classList.remove("visible");
 
       try {
-        const [statsRes, configRes] = await Promise.all([
-          fetch("/api/stats/hoy"),
-          fetch("/api/config")
-        ]);
-        const stats = await statsRes.json();
-        const config = await configRes.json();
+        const r = await fetch("/api/calculadora/meta", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ meta, km_l, valor_galon })
+        });
+        const data = await r.json();
+        if (data.error) { err.textContent = data.error; err.classList.add("visible"); return; }
 
-        const gastoHoy = (stats.km_total || 0) * config.costo_km;
-        const netaHoy = (stats.ganancia || 0) - gastoHoy;
-        const restante = meta - netaHoy;
-
-        const promedioNeto = stats.completados > 0 ? netaHoy / stats.completados : 0;
-
-        document.getElementById("meta-neta-hoy").textContent = `$${fmt(netaHoy)}`;
-        document.getElementById("meta-promedio").textContent = stats.completados > 0 ? `$${fmt(promedioNeto)}` : "—";
+        document.getElementById("meta-neta-hoy").textContent = `$${fmt(data.neta_hoy)}`;
+        document.getElementById("meta-promedio").textContent = data.completados > 0 ? `$${fmt(data.promedio_neto)}` : "—";
 
         const badge = document.getElementById("meta-viajes-faltan");
 
-        if (restante <= 0) {
+        if (data.restante <= 0) {
           document.getElementById("meta-restante").textContent = `¡Meta cumplida! 🎉`;
           badge.textContent = `Ya superaste tu meta de hoy`;
           badge.className = "veredicto v-good";
         } else {
-          document.getElementById("meta-restante").textContent = `$${fmt(restante)} restantes`;
-          if (promedioNeto > 0) {
-            const viajesFaltan = Math.ceil(restante / promedioNeto);
+          document.getElementById("meta-restante").textContent = `$${fmt(data.restante)} restantes`;
+          if (data.promedio_neto > 0) {
+            const viajesFaltan = Math.ceil(data.restante / data.promedio_neto);
             badge.textContent = `≈ ${viajesFaltan} viaje${viajesFaltan !== 1 ? "s" : ""} más, al ritmo de hoy`;
             badge.className = "veredicto v-mid";
           } else {

@@ -263,3 +263,16 @@ def calcular_costo_por_distancia(km):
     costo_km = calcular_costo_km()
 
     return round(km * costo_km, 0)
+# =========================================
+# COSTO POR KM — CÁLCULO INDEPENDIENTE
+# (no usa la configuración guardada en DB)
+# =========================================
+
+def calcular_costo_km_manual(km_l, valor_galon):
+
+    km_por_galon = km_l * 3.785
+
+    if km_por_galon <= 0:
+        return 0
+
+    return round(valor_galon / km_por_galon, 2)

@@ -13,43 +13,51 @@ def registrar_api(app):
         return render_template("calculadora.html")
 
     # ==========================================
-    # API — TANQUEADA → KM POSIBLES
+    # API — TANQUEADA → KM POSIBLES (independiente)
     # ==========================================
     @app.route("/api/calculadora/tanqueada", methods=["POST"])
     def api_calc_tanqueada():
-        from fuel import calcular_km_con_monto, calcular_costo_km
+        from fuel import calcular_costo_km_manual
         data = request.get_json()
         try:
             monto = float(data.get("monto", 0))
+            km_l = float(data.get("km_l", 0))
+            valor_galon = float(data.get("valor_galon", 0))
         except (TypeError, ValueError):
-            return jsonify({"error": "Monto inválido"}), 400
+            return jsonify({"error": "Datos inválidos"}), 400
 
-        if monto <= 0:
-            return jsonify({"error": "Monto inválido"}), 400
+        if monto <= 0 or km_l <= 0 or valor_galon <= 0:
+            return jsonify({"error": "Completa todos los campos"}), 400
+
+        costo_km = calcular_costo_km_manual(km_l, valor_galon)
+        if costo_km <= 0:
+            return jsonify({"error": "Datos de combustible inválidos"}), 400
 
         return jsonify({
-            "km_posibles": calcular_km_con_monto(monto),
-            "costo_km": calcular_costo_km()
+            "km_posibles": round(monto / costo_km, 1),
+            "costo_km": costo_km
         })
 
     # ==========================================
-    # API — EVALUAR VIAJE MANUAL
+    # API — EVALUAR VIAJE MANUAL (independiente)
     # ==========================================
     @app.route("/api/calculadora/evaluar", methods=["POST"])
     def api_calc_evaluar():
         from score import calcular_score
-        from fuel import calcular_costo_km
+        from fuel import calcular_costo_km_manual
         data = request.get_json()
 
         try:
             ganancia = float(data.get("ganancia", 0))
             distancia_total = float(data.get("distancia_total", 0))
             tiempo_total = float(data.get("tiempo_total", 0))
+            km_l = float(data.get("km_l", 0))
+            valor_galon = float(data.get("valor_galon", 0))
         except (TypeError, ValueError):
             return jsonify({"error": "Datos inválidos"}), 400
 
-        if ganancia <= 0 or distancia_total <= 0:
-            return jsonify({"error": "Faltan datos"}), 400
+        if ganancia <= 0 or distancia_total <= 0 or km_l <= 0 or valor_galon <= 0:
+            return jsonify({"error": "Completa todos los campos"}), 400
 
         datos = {
             "tipo_viaje": "Manual",
@@ -63,7 +71,7 @@ def registrar_api(app):
         (_, _, dinero_por_km, dinero_por_min,
          score_visual, estado_score) = calcular_score(datos)
 
-        costo_km = calcular_costo_km()
+        costo_km = calcular_costo_km_manual(km_l, valor_galon)
         gasto_combustible = round(distancia_total * costo_km, 0)
         ganancia_neta = round(ganancia - gasto_combustible, 0)
         dinero_por_hora = round(dinero_por_min * 60, 0) if tiempo_total > 0 else 0
@@ -77,7 +85,58 @@ def registrar_api(app):
             "gasto_combustible": gasto_combustible,
             "ganancia_neta": ganancia_neta
         })
-    
+
+    # ==========================================
+    # API — META DEL DÍA (independiente)
+    # usa /api/stats/hoy solo para datos reales
+    # de viajes ya registrados, no de configuracion
+    # ==========================================
+    @app.route("/api/calculadora/meta", methods=["POST"])
+    def api_calc_meta():
+        from fuel import calcular_costo_km_manual
+        data = request.get_json()
+
+        try:
+            meta = float(data.get("meta", 0))
+            km_l = float(data.get("km_l", 0))
+            valor_galon = float(data.get("valor_galon", 0))
+        except (TypeError, ValueError):
+            return jsonify({"error": "Datos inválidos"}), 400
+
+        if meta <= 0 or km_l <= 0 or valor_galon <= 0:
+            return jsonify({"error": "Completa todos los campos"}), 400
+
+        with state.STATE_LOCK:
+            cursor.execute("""
+                SELECT COUNT(*) FROM viajes WHERE estado='completado'
+                AND DATE(fecha) = DATE('now', '-5 hours')
+            """)
+            completados = cursor.fetchone()[0]
+
+            cursor.execute("""
+                SELECT SUM(dinero) FROM viajes WHERE estado='completado'
+                AND DATE(fecha) = DATE('now', '-5 hours')
+            """)
+            ganancia_hoy = cursor.fetchone()[0] or 0
+
+            cursor.execute("""
+                SELECT SUM(distancia_total) FROM viajes WHERE estado='completado'
+                AND DATE(fecha) = DATE('now', '-5 hours')
+            """)
+            km_hoy = cursor.fetchone()[0] or 0
+
+        costo_km = calcular_costo_km_manual(km_l, valor_galon)
+        gasto_hoy = round(km_hoy * costo_km, 0)
+        neta_hoy = round(ganancia_hoy - gasto_hoy, 0)
+        restante = round(meta - neta_hoy, 0)
+        promedio_neto = round(neta_hoy / completados, 0) if completados > 0 else 0
+
+        return jsonify({
+            "neta_hoy": neta_hoy,
+            "restante": restante,
+            "promedio_neto": promedio_neto,
+            "completados": completados
+        })
     # ==========================================
     # ESTADO JSON
     # ==========================================
