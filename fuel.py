@@ -241,3 +241,25 @@ def obtener_resumen_combustible():
 {restante:,.0f} COP
 
 """
+# =========================================
+# KM POSIBLES SEGÚN MONTO TANQUEADO
+# =========================================
+
+def calcular_km_con_monto(monto):
+
+    costo_km = calcular_costo_km()
+
+    if costo_km <= 0:
+        return 0
+
+    return round(monto / costo_km, 1)
+
+# =========================================
+# COSTO DE COMBUSTIBLE PARA X KM
+# =========================================
+
+def calcular_costo_por_distancia(km):
+
+    costo_km = calcular_costo_km()
+
+    return round(km * costo_km, 0)

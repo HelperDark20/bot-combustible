@@ -5,7 +5,79 @@ from config import VAPID_PUBLIC_KEY
 import sqlite3
 
 def registrar_api(app):
+    # ==========================================
+    # CALCULADORA — página
+    # ==========================================
+    @app.route("/calculadora")
+    def calculadora():
+        return render_template("calculadora.html")
 
+    # ==========================================
+    # API — TANQUEADA → KM POSIBLES
+    # ==========================================
+    @app.route("/api/calculadora/tanqueada", methods=["POST"])
+    def api_calc_tanqueada():
+        from fuel import calcular_km_con_monto, calcular_costo_km
+        data = request.get_json()
+        try:
+            monto = float(data.get("monto", 0))
+        except (TypeError, ValueError):
+            return jsonify({"error": "Monto inválido"}), 400
+
+        if monto <= 0:
+            return jsonify({"error": "Monto inválido"}), 400
+
+        return jsonify({
+            "km_posibles": calcular_km_con_monto(monto),
+            "costo_km": calcular_costo_km()
+        })
+
+    # ==========================================
+    # API — EVALUAR VIAJE MANUAL
+    # ==========================================
+    @app.route("/api/calculadora/evaluar", methods=["POST"])
+    def api_calc_evaluar():
+        from score import calcular_score
+        from fuel import calcular_costo_km
+        data = request.get_json()
+
+        try:
+            ganancia = float(data.get("ganancia", 0))
+            distancia_total = float(data.get("distancia_total", 0))
+            tiempo_total = float(data.get("tiempo_total", 0))
+        except (TypeError, ValueError):
+            return jsonify({"error": "Datos inválidos"}), 400
+
+        if ganancia <= 0 or distancia_total <= 0:
+            return jsonify({"error": "Faltan datos"}), 400
+
+        datos = {
+            "tipo_viaje": "Manual",
+            "dinero": ganancia,
+            "distancia_recogida_km": distancia_total,
+            "distancia_destino_km": 0,
+            "tiempo_recogida_min": tiempo_total,
+            "tiempo_destino_min": 0
+        }
+
+        (_, _, dinero_por_km, dinero_por_min,
+         score_visual, estado_score) = calcular_score(datos)
+
+        costo_km = calcular_costo_km()
+        gasto_combustible = round(distancia_total * costo_km, 0)
+        ganancia_neta = round(ganancia - gasto_combustible, 0)
+        dinero_por_hora = round(dinero_por_min * 60, 0) if tiempo_total > 0 else 0
+
+        return jsonify({
+            "dinero_por_km": dinero_por_km,
+            "dinero_por_min": dinero_por_min,
+            "dinero_por_hora": dinero_por_hora,
+            "score_visual": score_visual,
+            "estado_score": estado_score,
+            "gasto_combustible": gasto_combustible,
+            "ganancia_neta": ganancia_neta
+        })
+    
     # ==========================================
     # ESTADO JSON
     # ==========================================
