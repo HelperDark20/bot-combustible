@@ -2,6 +2,13 @@
 # IMPORTS
 # ==========================================
 from api import registrar_api
+from blueprints.pages import pages_bp
+from blueprints.api_calculadora import api_calculadora_bp
+from blueprints.api_operativo import api_operativo_bp
+from blueprints.api_inicio import api_inicio_bp
+from blueprints.api_stats import api_stats_bp
+from blueprints.api_historial import api_historial_bp
+
 import uuid
 import state
 from score import construir_respuesta
@@ -23,7 +30,18 @@ import threading
 flask_app = Flask(__name__)
 
 # ==========================================
-# API
+# BLUEPRINTS
+# ==========================================
+flask_app.register_blueprint(pages_bp)
+flask_app.register_blueprint(api_calculadora_bp)
+flask_app.register_blueprint(api_operativo_bp)
+flask_app.register_blueprint(api_inicio_bp)
+flask_app.register_blueprint(api_stats_bp)
+flask_app.register_blueprint(api_historial_bp)
+
+# ==========================================
+# API — lo que falta migrar a blueprints
+# (config, push)
 # ==========================================
 registrar_api(flask_app)
 
@@ -101,30 +119,32 @@ def procesar_y_notificar(data, viaje_id, resultado_score):
         # ======================================
         # TELEGRAM
         # ======================================
-        texto, reply_markup = render_operativo()
-        if state.message_id_operativo:
-            requests.post(
-                f"https://api.telegram.org/bot{TOKEN}/editMessageText",
-                json={
-                    "chat_id": CHAT_ID,
-                    "message_id": state.message_id_operativo,
-                    "text": texto,
-                    "reply_markup": reply_markup.to_dict()
-                },
-                timeout=10
-            )
-        else:
-            response = requests.post(
-                f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-                json={
-                    "chat_id": CHAT_ID,
-                    "text": texto,
-                    "reply_markup": reply_markup.to_dict()
-                },
-                timeout=10
-            )
-            resultado = response.json()
-            state.message_id_operativo = resultado["result"]["message_id"]
+        with state.STATE_LOCK:
+            texto, reply_markup = render_operativo()
+
+            if state.message_id_operativo:
+                requests.post(
+                    f"https://api.telegram.org/bot{TOKEN}/editMessageText",
+                    json={
+                        "chat_id": CHAT_ID,
+                        "message_id": state.message_id_operativo,
+                        "text": texto,
+                        "reply_markup": reply_markup.to_dict()
+                    },
+                    timeout=10
+                )
+            else:
+                response = requests.post(
+                    f"https://api.telegram.org/bot{TOKEN}/sendMessage",
+                    json={
+                        "chat_id": CHAT_ID,
+                        "text": texto,
+                        "reply_markup": reply_markup.to_dict()
+                    },
+                    timeout=10
+                )
+                resultado = response.json()
+                state.message_id_operativo = resultado["result"]["message_id"]
 
     except Exception as e:
         import traceback
@@ -159,6 +179,16 @@ def procesar_imagen(ruta):
         import traceback
         print(f"🔥 ERROR IMAGEN: {e}")
         traceback.print_exc()
+    finally:
+        # ======================================
+        # LIMPIEZA — evitar fuga de archivos en disco
+        # ======================================
+        try:
+            import os
+            if os.path.exists(ruta):
+                os.remove(ruta)
+        except Exception as e:
+            print(f"⚠️ No se pudo borrar {ruta}: {e}")
 
 def procesar_texto(texto):
     try:

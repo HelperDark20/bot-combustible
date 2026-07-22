@@ -1,0 +1,122 @@
+/* ==========================================
+   INICIO.CSS
+   Estilos exclusivos de /inicio
+========================================== */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--green-dim);
+  border: 1.5px solid var(--green-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-icon i { font-size: 18px; color: var(--green); }
+
+/* ======================================
+   CARD GANANCIA
+====================================== */
+.card-ganancia {
+  background: var(--green-dim);
+  border: 1px solid var(--green-border);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 0 30px rgba(0,255,115,0.06);
+}
+
+.ganancia-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.ganancia-monto {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--green);
+  letter-spacing: -2px;
+  margin-bottom: 16px;
+}
+
+.mini-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.mini-stat {
+  background: rgba(0,0,0,0.25);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.mini-stat-val { font-size: 16px; font-weight: 800; color: white; }
+.mini-stat-label { font-size: 10px; color: var(--text-dim); margin-top: 2px; font-weight: 600; }
+
+/* ======================================
+   SECCIÓN VIAJES
+====================================== */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ver-todos {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+}
+
+/* ======================================
+   VER HISTORIAL COMPLETO
+====================================== */
+.btn-historial {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+}
+
+.btn-historial-left { display: flex; align-items: center; gap: 10px; }
+.btn-historial-left i { font-size: 18px; color: var(--text-dim); }
+.btn-historial-text { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.6); }
+.btn-historial-right { display: flex; align-items: center; gap: 6px; }
+
+.total-badge {
+  background: var(--green-dim);
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--green);
+}

@@ -1,0 +1,83 @@
+/* ==========================================
+   STATS.CSS
+   Estilos exclusivos de /stats
+========================================== */
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.card-ganancia {
+  background: var(--green-dim);
+  border: 1px solid var(--green-border);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.ganancia-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.ganancia-monto {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--green);
+  letter-spacing: -2px;
+  margin-bottom: 4px;
+}
+
+.ganancia-sub { font-size: 12px; color: rgba(255,255,255,0.4); }
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.card-label { font-size: 11px; color: var(--text-dim); font-weight: 600; margin-bottom: 6px; }
+
+.card-val { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.card-val span { font-size: 14px; color: var(--text-dim); font-weight: 500; }
+
+.card-hint { font-size: 11px; color: var(--text-dim); }
+.card-hint.green { color: var(--green); }
+.card-hint.red { color: var(--red); }
+
+.desglose {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.desglose-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 14px;
+}
+
+.desglose-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.desglose-row:last-child { border-bottom: none; }
+
+.desglose-left { display: flex; align-items: center; gap: 8px; }
+
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.desglose-label { font-size: 13px; color: rgba(255,255,255,0.7); }
+.desglose-val { font-size: 14px; font-weight: 700; color: var(--text); }
